@@ -18,12 +18,10 @@
     }
     .funnel-step {
         position: relative;
-        background-color: #4f46e5;
         color: white;
         padding: 0.75rem;
         margin: 0 auto;
-        clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
-        /* FIX: Added flex properties for centering */
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -42,7 +40,6 @@
       <h1 class="text-5xl font-bold text-slate-900">MAIC 综合运营日报</h1>
       <p class="text-xl text-slate-600 mt-3">统计日期：2025-07-22</p>
     </header>
-
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-12">
       <!-- KPI Cards -->
       <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
@@ -76,7 +73,6 @@
         <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-emerald-600"><i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>+2</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
       </div>
     </div>
-
     <main class="flex flex-col space-y-10">
       <!-- User Analysis -->
       <div class="shadow-none border rounded-lg bg-white">
@@ -92,7 +88,6 @@
             <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="funnel">转化漏斗</button>
             <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="session">会话分布</button>
           </div>
-          
           <div id="user-analysis-content">
             <div data-content="growth">
               <div class="h-96"><canvas id="userGrowthChart"></canvas></div>
@@ -121,7 +116,6 @@
           </div>
         </div>
       </div>
-      
       <!-- Content Analysis -->
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
@@ -148,7 +142,6 @@
           </div>
         </div>
       </div>
-
       <!-- User Feedback -->
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
@@ -158,7 +151,6 @@
         </div>
         <div id="feedback-list" class="p-6 pt-0 space-y-6"></div>
       </div>
-
       <!-- Performance Monitoring -->
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
@@ -176,11 +168,9 @@
       </div>
     </main>
   </div>
-
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       lucide.createIcons();
-
       // --- Mock Data ---
       const userGrowthData = [{ date: "07-16", 新增用户: 100, 上课用户: 30 },{ date: "07-17", 新增用户: 157, 上课用户: 4 },{ date: "07-18", 新增用户: 133, 上课用户: 2 },{ date: "07-19", 新增用户: 129, 上课用户: 4 },{ date: "07-20", 新增用户: 84, 上课用户: 0 },{ date: "07-21", 新增用户: 123, 上课用户: 2 },{ date: "07-22", 新增用户: 222, 上课用户: 3 }];
       const retentionData = [{ date: "07-21", day1: 2.44, day3: null, day7: null },{ date: "07-20", day1: 2.38, day3: null, day7: null },{ date: "07-18", day1: 3.01, day3: 1.5, day7: null },{ date: "07-17", day1: 1.27, day3: 0.64, day7: null }];
@@ -192,7 +182,7 @@
       const institutionData = [{ name: "国家智慧教育...", courses: 5, totalReg: 39438, newUsers: 276, classUsers: 65, periodDialog: 969, totalDialog: 267788 },{ name: "清华大学", courses: 18, totalReg: 1785, newUsers: 0, classUsers: 3, periodDialog: 27, totalDialog: 86710 },{ name: "MAIC体验客户", courses: 55, totalReg: 1215, newUsers: 0, classUsers: 9, periodDialog: 176, totalDialog: 30438 },{ name: "MAIC", courses: 27, totalReg: 555, newUsers: 0, classUsers: 3, periodDialog: 80, totalDialog: 3585 },];
       const feedbackData = [{ text: "字幕不显示", time: "14:49", type: "Bug", status: "待处理", username: "user_alpha" },{ text: "字幕卡住了不会翻页", time: "12:00", type: "Bug", status: "处理中", username: "user_beta" },{ text: "音频问题：斜体符号语音模型会读出来", time: "11:51", type: "音频问题", status: "已解决", username: "user_gamma" },{ text: "讲稿区域，英文的换行不能切割单词。", time: "11:51", type: "体验优化", status: "待处理", username: "user_delta" },];
       const perfMockData = { "all-all": { "首响-均值(秒)": 4.93, "首响-中位数(秒)": 4.77, "首响-95分位数(秒)": 7.44, "首响-9999分位数(秒)": 14.31, "首响-最大值(秒)": 14.31, "对话处理时长-均值(秒)": 3.63, "对话处理时长-最大值(秒)": 772.85, "模型调用并发-中位数": 3, "模型调用并发-95分位数": 3, "模型调用并发-最大值": 3, "模型调用并发-最大值时间": "2025-07-22 21:46:13", "对话并发-中位数": 7, "对话并发-95分位数": 7, "对话并发-最大值": 7, "对话并发-最大值时间": "2025-07-22 20:57:09", }, "tsinghua-all": { "首响-均值(秒)": 3.24, "首响-中位数(秒)": 2.97, "首响-95分位数(秒)": 4.65, "首响-9999分位数(秒)": 4.65, "首响-最大值(秒)": 4.65, "对话处理时长-均值(秒)": 1.91, "对话处理时长-最大值(秒)": 73.47, "模型调用并发-中位数": 2, "模型调用并发-95分位数": 2, "模型调用并发-最大值": 2, "模型调用并发-最大值时间": "2025-07-22 19:50:57", "对话并发-中位数": 2, "对话并发-95分位数": 2, "对话并发-最大值": 2, "对话并发-最大值时间": "2025-07-22 19:51:05", }, };
-
+      
       // --- Tab Switching Logic ---
       function setupTabs(tabsContainerId, contentContainerId) {
         const tabsContainer = document.getElementById(tabsContainerId);
@@ -212,7 +202,7 @@
       
       // --- User Growth Chart ---
       new Chart(document.getElementById('userGrowthChart'), { type: 'line', data: { labels: userGrowthData.map(d => d.date), datasets: [{ label: '新增用户', data: userGrowthData.map(d => d.新增用户), borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.3 }, { label: '上课用户', data: userGrowthData.map(d => d.上课用户), borderColor: '#d97706', backgroundColor: 'rgba(217, 119, 6, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
-
+      
       // --- Retention Table ---
       const retentionTableBody = document.getElementById('retentionTableBody');
       retentionData.forEach(row => {
@@ -228,7 +218,51 @@
       const cutoffDateFilter = document.getElementById('cutoffDateFilter');
       const cohortSummary = document.getElementById('cohortSummary');
       const funnelDisplay = document.getElementById('funnelDisplay');
-      function updateCohortFunnel() { const instKey = cohortInstFilter.value; const cohortDateStr = cohortDateFilter.value; const cutoffDateStr = cutoffDateFilter.value; const data = cohortFunnelMockData[instKey]?.[cohortDateStr]; if (!data) { cohortSummary.textContent = "无可用数据"; funnelDisplay.innerHTML = ''; return; } const cohortStartDate = new Date(cohortDateStr + "T00:00:00Z"); const cutoffEndDate = new Date(cutoffDateStr + "T23:59:59Z"); if (cutoffEndDate < cohortStartDate) { cohortSummary.textContent = "截止日期需晚于注册日期"; funnelDisplay.innerHTML = ''; return; } const dayDiff = Math.floor((cutoffEndDate.getTime() - cohortStartDate.getTime()) / (1000 * 60 * 60 * 24)); const totalUsers = data.totalNewUsers; const loginCount = data.login[dayDiff] ?? data.login[data.login.length - 1]; const classCount = data.class[dayDiff] ?? data.class[data.class.length - 1]; const speakCount = data.speak[dayDiff] ?? data.speak[data.speak.length - 1]; cohortSummary.innerHTML = `分析 <b>${cohortDateStr}</b> 注册的 <b>${totalUsers}</b> 人, 在 <b>${dayDiff + 1}</b> 日内的累计转化。`; const steps = [{ label: "注册", value: totalUsers, prev: totalUsers },{ label: "登录", value: loginCount, prev: totalUsers },{ label: "上课", value: classCount, prev: loginCount },{ label: "发言", value: speakCount, prev: classCount }]; const colors = ["#4338ca", "#4f46e5", "#6366f1", "#818cf8"]; funnelDisplay.innerHTML = ''; steps.forEach((step, i) => { const stepConversion = i > 0 && step.prev > 0 ? ((step.value / step.prev) * 100).toFixed(1) : 0; const totalConversion = totalUsers > 0 ? ((step.value / totalUsers) * 100).toFixed(1) : 0; if (i > 0) { funnelDisplay.innerHTML += `<div class="funnel-arrow text-center"><i data-lucide="arrow-down" class="w-4 h-4 mx-auto"></i><span class="text-sm font-medium">${stepConversion}%</span></div>`; } funnelDisplay.innerHTML += `<div class="funnel-step"><div class="font-bold text-lg">${step.label}: ${step.value} 人</div><div class="text-sm opacity-80">总转化率: ${totalConversion}%</div></div>`; }); lucide.createIcons(); }
+
+      function updateCohortFunnel() {
+        const instKey = cohortInstFilter.value;
+        const cohortDateStr = cohortDateFilter.value;
+        const cutoffDateStr = cutoffDateFilter.value;
+        const data = cohortFunnelMockData[instKey]?.[cohortDateStr];
+        if (!data) {
+          cohortSummary.textContent = "无可用数据";
+          funnelDisplay.innerHTML = '';
+          return;
+        }
+        const cohortStartDate = new Date(cohortDateStr + "T00:00:00Z");
+        const cutoffEndDate = new Date(cutoffDateStr + "T23:59:59Z");
+        if (cutoffEndDate < cohortStartDate) {
+          cohortSummary.textContent = "截止日期需晚于注册日期";
+          funnelDisplay.innerHTML = '';
+          return;
+        }
+        const dayDiff = Math.floor((cutoffEndDate.getTime() - cohortStartDate.getTime()) / (1000 * 60 * 60 * 24));
+        const totalUsers = data.totalNewUsers;
+        const loginCount = data.login[dayDiff] ?? data.login[data.login.length - 1];
+        const classCount = data.class[dayDiff] ?? data.class[data.class.length - 1];
+        const speakCount = data.speak[dayDiff] ?? data.speak[data.speak.length - 1];
+        cohortSummary.innerHTML = `分析 <b>${cohortDateStr}</b> 注册的 <b>${totalUsers}</b> 人, 在 <b>${dayDiff + 1}</b> 日内的累计转化。`;
+        const steps = [
+            { label: "注册", value: totalUsers, prev: totalUsers },
+            { label: "登录", value: loginCount, prev: totalUsers },
+            { label: "上课", value: classCount, prev: loginCount },
+            { label: "发言", value: speakCount, prev: classCount }
+        ];
+        const colors = ["#4338ca", "#4f46e5", "#6366f1", "#818cf8"];
+        funnelDisplay.innerHTML = '';
+        steps.forEach((step, i) => {
+            const stepConversion = i > 0 && step.prev > 0 ? ((step.value / step.prev) * 100).toFixed(1) : 0;
+            const totalConversion = totalUsers > 0 ? ((step.value / totalUsers) * 100).toFixed(1) : 0;
+            const clipPath = `polygon(${i * 8}% 0, ${100 - i * 8}% 0, ${100 - (i + 1) * 8}% 100%, ${(i + 1) * 8}% 100%)`;
+            const color = colors[i] || colors[colors.length - 1];
+
+            if (i > 0) {
+                funnelDisplay.innerHTML += `<div class="funnel-arrow text-center"><i data-lucide="arrow-down" class="w-4 h-4 mx-auto"></i><span class="text-sm font-medium">${stepConversion}%</span></div>`;
+            }
+            funnelDisplay.innerHTML += `<div class="funnel-step" style="background-color: ${color}; clip-path: ${clipPath};"><div class="font-bold text-lg">${step.label}: ${step.value} 人</div><div class="text-sm opacity-80">总转化率: ${totalConversion}%</div></div>`;
+        });
+        lucide.createIcons();
+      }
       cohortInstFilter.innerHTML = `<option value="all">全部机构</option><option value="wisdom_education">国家智慧教育平台</option>`;
       cohortDateFilter.innerHTML = `<option value="2025-07-21">2025-07-21</option><option value="2025-07-20">2025-07-20</option>`;
       cutoffDateFilter.value = "2025-07-23";
@@ -241,7 +275,18 @@
       const sessionSegmentFilter = document.getElementById('sessionSegmentFilter');
       const sessionSummary = document.getElementById('sessionSummary');
       let sessionChart;
-      function updateSessionChart() { let filtered = sessionMockData; if (sessionInstFilter.value !== "all") filtered = filtered.filter(d => d.inst === sessionInstFilter.value); if (sessionCourseFilter.value !== "all") filtered = filtered.filter(d => d.course === sessionCourseFilter.value); if (sessionSegmentFilter.value !== "all_users") filtered = filtered.filter(d => d.segment === sessionSegmentFilter.value); const result = new Array(chartLabels.length).fill(0); filtered.forEach(item => { for (let i = 0; i < result.length; i++) result[i] += item.values[i] || 0 }); const totalUsers = result.reduce((a, b) => a + b, 0); sessionSummary.innerHTML = `总上课用户数: <span class="font-bold">${totalUsers}</span> 人。(“0轮”指进入课程但未对话的用户)`; if (sessionChart) sessionChart.destroy(); sessionChart = new Chart(document.getElementById('sessionDistributionChart'), { type: 'bar', data: { labels: chartLabels, datasets: [{ label: '用户数', data: result, backgroundColor: '#4f46e5' }] }, options: { responsive: true, maintainAspectRatio: false } }); }
+      function updateSessionChart() {
+        let filtered = sessionMockData;
+        if (sessionInstFilter.value !== "all") filtered = filtered.filter(d => d.inst === sessionInstFilter.value);
+        if (sessionCourseFilter.value !== "all") filtered = filtered.filter(d => d.course === sessionCourseFilter.value);
+        if (sessionSegmentFilter.value !== "all_users") filtered = filtered.filter(d => d.segment === sessionSegmentFilter.value);
+        const result = new Array(chartLabels.length).fill(0);
+        filtered.forEach(item => { for (let i = 0; i < result.length; i++) result[i] += item.values[i] || 0 });
+        const totalUsers = result.reduce((a, b) => a + b, 0);
+        sessionSummary.innerHTML = `总上课用户数: <span class="font-bold">${totalUsers}</span> 人。(“0轮”指进入课程但未对话的用户)`;
+        if (sessionChart) sessionChart.destroy();
+        sessionChart = new Chart(document.getElementById('sessionDistributionChart'), { type: 'bar', data: { labels: chartLabels, datasets: [{ label: '用户数', data: result, backgroundColor: '#4f46e5' }] }, options: { responsive: true, maintainAspectRatio: false } });
+      }
       sessionInstFilter.innerHTML = `<option value="all">全部机构</option><option value="wisdom_education">国家智慧教育平台</option><option value="tsinghua">清华大学</option>`;
       sessionCourseFilter.innerHTML = `<option value="all">全部课程</option>` + Object.entries(courseMeta).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
       sessionSegmentFilter.innerHTML = `<option value="all_users">全部用户</option><option value="new_users">新用户</option><option value="old_users">老用户</option>`;
@@ -250,30 +295,16 @@
 
       // --- Content Analysis Tables ---
       const courseTableBody = document.getElementById('courseTableBody');
-      courseData.forEach(c => {
-        const row = courseTableBody.insertRow();
-        row.className = 'bg-white border-b';
-        row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${c.name}</td><td class="px-6 py-4">${c.students}</td><td class="px-6 py-4">${c.completed}</td><td class="px-6 py-4">${c.active}</td><td class="px-6 py-4">${c.posts}</td><td class="px-6 py-4">${c.avgPages}</td><td class="px-6 py-4">${c.avgPosts}</td>`;
-      });
+      courseData.forEach(c => { const row = courseTableBody.insertRow(); row.className = 'bg-white border-b'; row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${c.name}</td><td class="px-6 py-4">${c.students}</td><td class="px-6 py-4">${c.completed}</td><td class="px-6 py-4">${c.active}</td><td class="px-6 py-4">${c.posts}</td><td class="px-6 py-4">${c.avgPages}</td><td class="px-6 py-4">${c.avgPosts}</td>`; });
       const institutionTableBody = document.getElementById('institutionTableBody');
-      institutionData.forEach(i => {
-        const row = institutionTableBody.insertRow();
-        row.className = 'bg-white border-b';
-        row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${i.name}</td><td class="px-6 py-4">${i.courses}</td><td class="px-6 py-4">${i.totalReg}</td><td class="px-6 py-4">${i.newUsers}</td><td class="px-6 py-4">${i.classUsers}</td><td class="px-6 py-4">${i.periodDialog}</td><td class="px-6 py-4">${i.totalDialog}</td>`;
-      });
-
+      institutionData.forEach(i => { const row = institutionTableBody.insertRow(); row.className = 'bg-white border-b'; row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${i.name}</td><td class="px-6 py-4">${i.courses}</td><td class="px-6 py-4">${i.totalReg}</td><td class="px-6 py-4">${i.newUsers}</td><td class="px-6 py-4">${i.classUsers}</td><td class="px-6 py-4">${i.periodDialog}</td><td class="px-6 py-4">${i.totalDialog}</td>`; });
+      
       // --- Feedback List ---
       const feedbackList = document.getElementById('feedback-list');
       const statusColors = { "待处理": "#f87171", "处理中": "#fb923c", "已解决": "#4ade80" };
       const badgeColors = { "待处理": "bg-red-100 text-red-800", "处理中": "bg-orange-100 text-orange-800", "已解决": "bg-green-100 text-green-800" };
-      feedbackData.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'relative pl-6 border-l-4';
-        div.style.borderColor = statusColors[item.status];
-        div.innerHTML = `<p class="text-base font-medium text-slate-800">${item.text}</p><div class="flex justify-between items-center mt-2"><p class="text-sm text-slate-500">${item.username} · ${item.time}</p><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeColors[item.status]}">${item.status}</span></div>`;
-        feedbackList.appendChild(div);
-      });
-
+      feedbackData.forEach(item => { const div = document.createElement('div'); div.className = 'relative pl-6 border-l-4'; div.style.borderColor = statusColors[item.status]; div.innerHTML = `<p class="text-base font-medium text-slate-800">${item.text}</p><div class="flex justify-between items-center mt-2"><p class="text-sm text-slate-500">${item.username} · ${item.time}</p><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeColors[item.status]}">${item.status}</span></div>`; feedbackList.appendChild(div); });
+      
       // --- Performance Table ---
       const perfInstFilter = document.getElementById('perfInstFilter');
       const perfCourseFilter = document.getElementById('perfCourseFilter');
@@ -283,18 +314,10 @@
         const courseKey = perfCourseFilter.value;
         const data = perfMockData[`${instKey}-${courseKey}`] || perfMockData[`${instKey}-all`] || perfMockData['all-all'];
         let html = '<tbody>';
-        const sections = {
-          "首响": ["均值(秒)", "中位数(秒)", "95分位数(秒)", "9999分位数(秒)", "最大值(秒)"],
-          "对话处理时长": ["均值(秒)", "最大值(秒)"],
-          "模型调用并发": ["中位数", "95分位数", "最大值", "最大值时间"],
-          "对话并发": ["中位数", "95分位数", "最大值", "最大值时间"]
-        };
+        const sections = { "首响": ["均值(秒)", "中位数(秒)", "95分位数(秒)", "9999分位数(秒)", "最大值(秒)"], "对话处理时长": ["均值(秒)", "最大值(秒)"], "模型调用并发": ["中位数", "95分位数", "最大值", "最大值时间"], "对话并发": ["中位数", "95分位数", "最大值", "最大值时间"] };
         for (const section in sections) {
           html += `<tr class="bg-slate-100 hover:bg-slate-100"><td colspan="2" class="p-3 font-semibold text-slate-800">${section}</td></tr>`;
-          sections[section].forEach(metric => {
-            const key = `${section}-${metric}`;
-            html += `<tr><td class="pl-8 p-3 text-slate-600">${metric}</td><td class="p-3 font-semibold text-slate-900">${data[key] || '-'}</td></tr>`;
-          });
+          sections[section].forEach(metric => { const key = `${section}-${metric}`; html += `<tr><td class="pl-8 p-3 text-slate-600">${metric}</td><td class="p-3 font-semibold text-slate-900">${data[key] || '-'}</td></tr>`; });
         }
         html += '</tbody>';
         perfTable.innerHTML = html;
@@ -307,4 +330,3 @@
   </script>
 </body>
 </html>
-
