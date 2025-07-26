@@ -1,368 +1,310 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAIC 综合运营日报</title>
-    <!-- 引入Tailwind CSS以实现快速、现代化的样式设计 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入Chart.js用于数据可视化图表 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- 引入Lucide图标库 -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        /* 使用更适合数据展示的字体 */
-        body {
-            font-family: 'Inter', 'Helvetica Neue', 'Arial', 'sans-serif';
-            background-color: #f8fafc;
-        }
-        .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            padding: 1rem;
-        }
-        .section-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #111827;
-        }
-        .filter-select, .filter-date {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.875rem;
-            border-radius: 0.375rem;
-            border: 1px solid #d1d5db;
-            background-color: #fff;
-        }
-        .filter-select {
-             padding-right: 2.5rem;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-        }
-        .accordion-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 1rem;
-            font-weight: 600;
-            color: #1f2937;
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .accordion-header:hover {
-            background-color: #f3f4f6;
-        }
-        .accordion-icon {
-            transition: transform 0.3s ease;
-        }
-        .accordion-header.open .accordion-icon {
-            transform: rotate(180deg);
-        }
-        .accordion-content {
-            padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-top: 0;
-            background-color: #fff;
-        }
-        /* Funnel Styles */
-        .funnel-step {
-            position: relative;
-            background-color: #4f46e5;
-            color: white;
-            padding: 0.75rem;
-            margin: 0 auto;
-            clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
-        }
-        .funnel-arrow {
-            color: #4b5563;
-            font-weight: 500;
-            padding: 0.25rem 0;
-        }
-        /* Table styles for compact view */
-        .compact-table th, .compact-table td {
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            white-space: nowrap;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAIC 综合运营日报</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      background-color: #f8fafc;
+    }
+    .tabs-trigger[data-state="active"] {
+      background-color: white;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+    .funnel-step {
+        position: relative;
+        background-color: #4f46e5;
+        color: white;
+        padding: 0.75rem;
+        margin: 0 auto;
+        clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+        /* FIX: Added flex properties for centering */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .funnel-arrow {
+        color: #4b5563;
+        font-weight: 500;
+        padding: 0.25rem 0;
+    }
+  </style>
 </head>
-<body class="p-2 sm:p-4">
-    <div class="max-w-3xl mx-auto">
-        <!-- 头部 -->
-        <header class="mb-4 text-center">
-            <h1 class="text-2xl font-bold text-gray-800">MAIC 综合运营日报</h1>
-            <p class="text-sm text-gray-500 mt-1">统计日期：2025-07-22</p>
-        </header>
+<body class="bg-slate-50 min-h-screen">
+  <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
+    <header class="mb-12">
+      <h1 class="text-5xl font-bold text-slate-900">MAIC 综合运营日报</h1>
+      <p class="text-xl text-slate-600 mt-3">统计日期：2025-07-22</p>
+    </header>
 
-        <!-- 第一层：核心指标概览 (始终可见) -->
-        <section id="kpi-summary" class="mb-4">
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div class="card text-center">
-                    <p class="text-sm font-medium text-gray-500">注册用户数</p>
-                    <p class="text-2xl font-bold mt-1">44,473</p>
-                </div>
-                <div class="card text-center">
-                    <p class="text-sm font-medium text-gray-500">新增用户</p>
-                    <p class="text-2xl font-bold mt-1">276</p>
-                </div>
-                <div class="card text-center">
-                    <p class="text-sm font-medium text-gray-500">活跃用户</p>
-                    <p class="text-2xl font-bold mt-1">84</p>
-                </div>
-                <div class="card text-center">
-                    <p class="text-sm font-medium text-gray-500">新用户激活率</p>
-                    <p class="text-2xl font-bold mt-1">1.35%</p>
-                </div>
-                <div class="card text-center">
-                    <p class="text-sm font-medium text-gray-500">次日留存率</p>
-                    <p class="text-2xl font-bold mt-1">2.44%</p>
-                </div>
-                <div class="card text-center">
-                    <p class="text-sm font-medium text-gray-500">用户反馈数</p>
-                    <p class="text-2xl font-bold mt-1">6</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 手风琴式折叠容器 -->
-        <div id="accordion-container" class="space-y-2">
-            <!-- 第二层：用户分析 -->
-            <div class="accordion-item rounded-lg overflow-hidden">
-                <button class="accordion-header open">
-                    <span><i data-lucide="users" class="inline-block mr-2 h-5 w-5"></i>用户分析</span>
-                    <i data-lucide="chevron-down" class="accordion-icon h-5 w-5"></i>
-                </button>
-                <div class="accordion-content">
-                    <div class="space-y-6">
-                        <div class="card">
-                            <h3 class="section-title mb-4">近7日用户行为分析</h3>
-                            <div class="relative h-64"><canvas id="userGrowthChart"></canvas></div>
-                        </div>
-                        <div class="card">
-                            <h3 class="section-title mb-4">新用户留存热力图</h3>
-                            <div class="overflow-x-auto"><table class="w-full text-xs text-center" id="retentionTable"></table></div>
-                        </div>
-                        <div class="card" id="cohort-funnel-card">
-                             <!-- Cohort Funnel Content Injected Here -->
-                        </div>
-                         <div class="card" id="session-distribution-card">
-                            <!-- Session Distribution Content Injected Here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 第三层：内容分析 -->
-            <div class="accordion-item rounded-lg overflow-hidden">
-                <button class="accordion-header">
-                    <span><i data-lucide="book-open" class="inline-block mr-2 h-5 w-5"></i>内容分析</span>
-                    <i data-lucide="chevron-down" class="accordion-icon h-5 w-5"></i>
-                </button>
-                <div class="accordion-content hidden">
-                    <div class="space-y-4">
-                        <div class="card">
-                            <h3 class="section-title mb-4">课程板块</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm compact-table">
-                                    <thead>
-                                        <tr class="bg-gray-50">
-                                            <th>课程名称</th><th>选课人数</th><th>已完课用户数</th><th>活跃用户数</th><th>用户发言数(次)</th><th>平均学习(页)</th><th>平均发言(次)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td>迈向通用的人工智能</td><td>9634</td><td>120</td><td>30</td><td>15</td><td>15.3</td><td>0.5</td></tr>
-                                        <tr><td>MAIC说明书</td><td>4115</td><td>281</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-                                        <tr><td>社会心理学</td><td>2795</td><td>5</td><td>7</td><td>0</td><td>4.6</td><td>0.0</td></tr>
-                                        <tr><td>大学如何学</td><td>978</td><td>9</td><td>7</td><td>0</td><td>6.4</td><td>0.0</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <h3 class="section-title mb-4">机构板块</h3>
-                             <div class="overflow-x-auto">
-                                <table class="w-full text-sm compact-table">
-                                    <thead>
-                                        <tr class="bg-gray-50">
-                                            <th>机构名称</th><th>课程数</th><th>累计注册</th><th>新增用户</th><th>上课用户</th><th>周期内对话</th><th>累计对话</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td>国家智慧教育...</td><td>5</td><td>39438</td><td>276</td><td>65</td><td>969</td><td>267788</td></tr>
-                                        <tr><td>清华大学</td><td>18</td><td>1785</td><td>0</td><td>3</td><td>27</td><td>86710</td></tr>
-                                        <tr><td>MAIC体验客户</td><td>55</td><td>1215</td><td>0</td><td>9</td><td>176</td><td>30438</td></tr>
-                                        <tr><td>MAIC</td><td>27</td><td>555</td><td>0</td><td>3</td><td>80</td><td>3585</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 第四层：平台性能监控 -->
-             <div class="accordion-item rounded-lg overflow-hidden">
-                <button class="accordion-header">
-                    <span><i data-lucide="bar-chart-3" class="inline-block mr-2 h-5 w-5"></i>平台性能监控</span>
-                    <i data-lucide="chevron-down" class="accordion-icon h-5 w-5"></i>
-                </button>
-                <div class="accordion-content hidden">
-                    <div class="card">
-                        <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                            <div class="flex-1">
-                                <label for="perfInstFilter" class="text-xs text-gray-600">机构:</label>
-                                <select id="perfInstFilter" class="filter-select w-full mt-1"></select>
-                            </div>
-                            <div class="flex-1">
-                                <label for="perfCourseFilter" class="text-xs text-gray-600">课程:</label>
-                                <select id="perfCourseFilter" class="filter-select w-full mt-1"></select>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm compact-table" id="perfDataTable">
-                                <!-- Performance data will be rendered here by JS -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 第五层：用户声音 -->
-             <div class="accordion-item rounded-lg overflow-hidden">
-                <button class="accordion-header">
-                    <span><i data-lucide="message-circle" class="inline-block mr-2 h-5 w-5"></i>用户声音</span>
-                    <i data-lucide="chevron-down" class="accordion-icon h-5 w-5"></i>
-                </button>
-                <div class="accordion-content hidden">
-                    <div class="space-y-3">
-                        <div class="p-3 bg-gray-50 rounded-md border">
-                            <p class="text-sm text-gray-800">字幕不显示</p>
-                            <p class="text-xs text-gray-500 mt-1">14:49 | Bug | <span class="font-semibold text-red-600">待处理</span></p>
-                        </div>
-                        <div class="p-3 bg-gray-50 rounded-md border">
-                            <p class="text-sm text-gray-800">字幕卡住了不会翻页</p>
-                            <p class="text-xs text-gray-500 mt-1">12:00 | Bug | <span class="font-semibold text-orange-600">处理中</span></p>
-                        </div>
-                         <div class="p-3 bg-gray-50 rounded-md border">
-                            <p class="text-sm text-gray-800">音频问题：斜体符号语音模型会读出来</p>
-                            <p class="text-xs text-gray-500 mt-1">11:51 | 音频问题 | <span class="font-semibold text-green-600">已解决</span></p>
-                        </div>
-                         <div class="p-3 bg-gray-50 rounded-md border">
-                            <p class="text-sm text-gray-800">讲稿区域，英文的换行不能切割单词。</p>
-                            <p class="text-xs text-gray-500 mt-1">11:51 | 体验优化 | <span class="font-semibold text-red-600">待处理</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-12">
+      <!-- KPI Cards -->
+      <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
+        <p class="text-lg font-semibold text-slate-800">注册用户数</p>
+        <p class="text-4xl font-bold text-slate-900 mt-2">44,473</p>
+        <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-emerald-600"><i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>+1.2%</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
+      </div>
+      <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
+        <p class="text-lg font-semibold text-slate-800">新增用户</p>
+        <p class="text-4xl font-bold text-slate-900 mt-2">276</p>
+        <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-emerald-600"><i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>+8.5%</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
+      </div>
+      <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
+        <p class="text-lg font-semibold text-slate-800">活跃用户</p>
+        <p class="text-4xl font-bold text-slate-900 mt-2">84</p>
+        <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-red-600"><i data-lucide="arrow-down" class="h-4 w-4 mr-1"></i>-3.1%</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
+      </div>
+      <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
+        <p class="text-lg font-semibold text-slate-800">新用户激活率</p>
+        <p class="text-4xl font-bold text-slate-900 mt-2">1.35%</p>
+        <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-emerald-600"><i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>+0.15%</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
+      </div>
+      <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
+        <p class="text-lg font-semibold text-slate-800">次日留存率</p>
+        <p class="text-4xl font-bold text-slate-900 mt-2">2.44%</p>
+        <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-red-600"><i data-lucide="arrow-down" class="h-4 w-4 mr-1"></i>-0.2%</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
+      </div>
+      <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
+        <p class="text-lg font-semibold text-slate-800">用户反馈数</p>
+        <p class="text-4xl font-bold text-slate-900 mt-2">6</p>
+        <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium text-emerald-600"><i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>+2</span><span class="text-slate-500 ml-1.5">较昨日</span></div>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // --- Accordion Logic ---
-            const accordionHeaders = document.querySelectorAll('.accordion-header');
-            accordionHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    const content = header.nextElementSibling;
-                    const wasOpen = header.classList.contains('open');
-                    
-                    accordionHeaders.forEach(otherHeader => {
-                        otherHeader.classList.remove('open');
-                        otherHeader.nextElementSibling.classList.add('hidden');
-                    });
+    <main class="flex flex-col space-y-10">
+      <!-- User Analysis -->
+      <div class="shadow-none border rounded-lg bg-white">
+        <div class="p-6">
+          <h2 class="flex items-center text-2xl font-bold text-slate-900">
+            <i data-lucide="users" class="mr-3 h-7 w-7 text-indigo-600"></i>用户分析
+          </h2>
+        </div>
+        <div class="p-6 pt-4">
+          <div id="user-analysis-tabs" class="grid w-full grid-cols-2 md:grid-cols-4 mb-6 border p-1 rounded-lg bg-slate-50">
+            <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="growth" data-state="active">近7日行为</button>
+            <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="retention">留存热力图</button>
+            <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="funnel">转化漏斗</button>
+            <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="session">会话分布</button>
+          </div>
+          
+          <div id="user-analysis-content">
+            <div data-content="growth">
+              <div class="h-96"><canvas id="userGrowthChart"></canvas></div>
+            </div>
+            <div data-content="retention" class="hidden">
+              <table class="w-full text-sm text-left text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3">注册日</th><th class="px-6 py-3">次日</th><th class="px-6 py-3">3日</th><th class="px-6 py-3">7日</th></tr></thead><tbody id="retentionTableBody"></tbody></table>
+            </div>
+            <div data-content="funnel" class="hidden">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <select id="cohortInstFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+                <select id="cohortDateFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+                <input type="date" id="cutoffDateFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"/>
+              </div>
+              <div id="cohortSummary" class="text-center text-sm text-slate-600 p-2 bg-slate-100 rounded-md mb-4"></div>
+              <div id="funnelDisplay" class="max-w-sm mx-auto space-y-0"></div>
+            </div>
+            <div data-content="session" class="hidden">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <select id="sessionInstFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+                <select id="sessionCourseFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+                <select id="sessionSegmentFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+              </div>
+              <div id="sessionSummary" class="text-center text-sm text-slate-600 p-2 bg-slate-100 rounded-md mb-4"></div>
+              <div class="h-80"><canvas id="sessionDistributionChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Content Analysis -->
+      <div class="shadow-none border rounded-lg bg-white">
+        <div class="p-6">
+          <h2 class="flex items-center text-2xl font-bold text-slate-900">
+            <i data-lucide="book-open" class="mr-3 h-7 w-7 text-indigo-600"></i>内容分析
+          </h2>
+        </div>
+        <div class="p-6 pt-4">
+          <div id="content-analysis-tabs" class="mb-4 border p-1 rounded-lg bg-slate-50 inline-flex">
+            <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="courses" data-state="active">课程板块</button>
+            <button class="tabs-trigger py-2 px-4 text-sm font-medium text-slate-700 rounded-md" data-tab="institutions">机构板块</button>
+          </div>
+          <div id="content-analysis-content">
+            <div data-content="courses">
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3">课程名称</th><th class="px-6 py-3">选课人数</th><th class="px-6 py-3">已完课用户</th><th class="px-6 py-3">活跃用户</th><th class="px-6 py-3">用户发言数</th><th class="px-6 py-3">平均学习(页)</th><th class="px-6 py-3">平均发言(次)</th></tr></thead><tbody id="courseTableBody"></tbody></table>
+              </div>
+            </div>
+            <div data-content="institutions" class="hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3">机构名称</th><th class="px-6 py-3">课程数</th><th class="px-6 py-3">累计注册</th><th class="px-6 py-3">新增用户</th><th class="px-6 py-3">上课用户</th><th class="px-6 py-3">周期内对话</th><th class="px-6 py-3">累计对话</th></tr></thead><tbody id="institutionTableBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                    if (!wasOpen) {
-                        header.classList.add('open');
-                        content.classList.remove('hidden');
-                    }
-                });
-            });
+      <!-- User Feedback -->
+      <div class="shadow-none border rounded-lg bg-white">
+        <div class="p-6">
+          <h2 class="flex items-center text-2xl font-bold text-slate-900">
+            <i data-lucide="message-square" class="mr-3 h-7 w-7 text-indigo-600"></i>用户声音
+          </h2>
+        </div>
+        <div id="feedback-list" class="p-6 pt-0 space-y-6"></div>
+      </div>
 
-            // --- Initialize Icons ---
-            lucide.createIcons();
+      <!-- Performance Monitoring -->
+      <div class="shadow-none border rounded-lg bg-white">
+        <div class="p-6">
+          <h2 class="flex items-center text-2xl font-bold text-slate-900">
+            <i data-lucide="bar-chart-3" class="mr-3 h-7 w-7 text-indigo-600"></i>平台性能监控
+          </h2>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <select id="perfInstFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+            <select id="perfCourseFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+          </div>
+          <table class="w-full text-sm" id="perfTable"></table>
+        </div>
+      </div>
+    </main>
+  </div>
 
-            // --- Chart & Table Rendering ---
-            new Chart(document.getElementById('userGrowthChart').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: ['07-16', '07-17', '07-18', '07-19', '07-20', '07-21', '07-22'],
-                    datasets: [
-                        { label: '新增用户', data: [100, 157, 133, 129, 84, 123, 222], borderColor: '#3b82f6', tension: 0.1, pointRadius: 2 },
-                        { label: '上课用户', data: [30, 4, 2, 4, 0, 2, 3], borderColor: '#f97316', tension: 0.1, pointRadius: 2 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'bottom', labels:{boxWidth:12, padding:10} } } }
-            });
-            
-            document.getElementById('retentionTable').innerHTML = `
-                <thead><tr class="bg-gray-50"><th>注册日</th><th>次日</th><th>3日</th><th>7日</th></tr></thead>
-                <tbody>
-                    <tr><td>07-21</td><td class="bg-green-100 text-green-800">2.44%</td><td>-</td><td>-</td></tr>
-                    <tr><td>07-20</td><td class="bg-green-100 text-green-800">2.38%</td><td>-</td><td>-</td></tr>
-                    <tr><td>07-18</td><td class="bg-green-100 text-green-800 font-semibold">3.01%</td><td class="bg-green-100 text-green-800">1.50%</td><td>-</td></tr>
-                    <tr><td>07-17</td><td class="bg-green-100 text-green-800">1.27%</td><td class="bg-green-100 text-green-800">0.64%</td><td>-</td></tr>
-                </tbody>`;
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
 
-            // --- Interactive Components ---
-            const cohortFunnelCard = document.getElementById('cohort-funnel-card');
-            cohortFunnelCard.innerHTML = `<h3 class="section-title mb-4">新用户队列转化漏斗</h3><div class="flex flex-col sm:flex-row gap-4 mb-4"><div class="flex-1"><label for="cohortInstFilter" class="text-xs text-gray-600">机构:</label><select id="cohortInstFilter" class="filter-select w-full mt-1"></select></div><div class="flex-1"><label for="cohortSelector" class="text-xs text-gray-600">注册日期:</label><select id="cohortSelector" class="filter-select w-full mt-1"></select></div><div class="flex-1"><label for="cutoffDatePicker" class="text-xs text-gray-600">截止日期:</label><input type="date" id="cutoffDatePicker" class="filter-select w-full mt-1"></div></div><div id="cohort-summary" class="mb-4 p-2 bg-indigo-50 rounded-md text-center text-xs"></div><div id="funnel-display" class="w-full max-w-xs mx-auto space-y-1"></div>`;
-            const cohortFunnelMockData={'all':{'2025-07-21':{totalNewUsers:123,login:[100,105],class:[2,5],speak:[1,2]},'2025-07-20':{totalNewUsers:84,login:[70,72,75],class:[2,5,8],speak:[1,2,3]}},'wisdom_education':{'2025-07-21':{totalNewUsers:100,login:[80,85],class:[2,4],speak:[1,1]},'2025-07-20':{totalNewUsers:70,login:[60,62,65],class:[2,4,6],speak:[1,1,2]}}};const cohortInstFilter=document.getElementById('cohortInstFilter');const cohortSelector=document.getElementById('cohortSelector');const cutoffDatePicker=document.getElementById('cutoffDatePicker');const funnelDisplay=document.getElementById('funnel-display');function renderCohortFunnel(values,totalUsers){funnelDisplay.innerHTML='';let prevValue=totalUsers;const funnelSteps=['注册','登录','上课','发言'];const funnelColors=['#4338ca','#4f46e5','#6366f1','#818cf8'];values.forEach((value,i)=>{const conversionRate=prevValue>0?((value/prevValue)*100).toFixed(1):0;if(i>0){funnelDisplay.innerHTML+=`<div class="funnel-arrow text-center text-xs"><i data-lucide="arrow-down" class="h-4 w-4 mx-auto"></i><span>${conversionRate}%</span></div>`;}funnelDisplay.innerHTML+=`<div class="funnel-step text-center text-sm" style="background-color: ${funnelColors[i]}; width: ${Math.max(20,100-i*15)}%;"><p class="font-bold">${funnelSteps[i]}: ${value} 人</p><p class="text-xs opacity-80">总转化率: ${totalUsers>0?((value/totalUsers)*100).toFixed(1):0}%</p></div>`;prevValue=value;});lucide.createIcons();}function updateCohortFunnel(){const instKey=cohortInstFilter.value;const cohortDateStr=cohortSelector.value;const cutoffDateStr=cutoffDatePicker.value;const cohortDate=new Date(cohortDateStr+'T00:00:00Z');const cutoffDate=new Date(cutoffDateStr+'T23:59:59Z');if(cutoffDate<cohortDate){document.getElementById('cohort-summary').innerHTML=`<p class="font-semibold text-red-600">截止日期需晚于注册日期</p>`;funnelDisplay.innerHTML='';return;}const dayDiff=Math.floor((cutoffDate-cohortDate)/(1000*60*60*24));const cohort=cohortFunnelMockData[instKey][cohortDateStr];const totalUsers=cohort.totalNewUsers;const loginCount=cohort.login[dayDiff]??cohort.login[cohort.login.length-1];const classCount=cohort.class[dayDiff]??cohort.class[cohort.class.length-1];const speakCount=cohort.speak[dayDiff]??cohort.speak[cohort.speak.length-1];document.getElementById('cohort-summary').innerHTML=`分析 <b class="font-bold">${cohortDateStr}</b> 注册的 <b class="font-bold">${totalUsers}</b> 人, 在 <b class="font-bold">${dayDiff+1}</b> 日内的累计转化。`;renderCohortFunnel([totalUsers,loginCount,classCount,speakCount],totalUsers);}function populateCohortFilters(){const instKey=cohortInstFilter.value;cohortSelector.innerHTML='';Object.keys(cohortFunnelMockData[instKey]).forEach(dateStr=>cohortSelector.add(new Option(dateStr,dateStr)));updateCohortFunnel();}['全部机构','国家智慧教育平台'].forEach((name,i)=>cohortInstFilter.add(new Option(name,['all','wisdom_education'][i])));const today=new Date('2025-07-23T12:00:00Z');cutoffDatePicker.value=today.toISOString().split('T')[0];cohortInstFilter.addEventListener('change',populateCohortFilters);cohortSelector.addEventListener('change',updateCohortFunnel);cutoffDatePicker.addEventListener('change',updateCohortFunnel);populateCohortFilters();
+      // --- Mock Data ---
+      const userGrowthData = [{ date: "07-16", 新增用户: 100, 上课用户: 30 },{ date: "07-17", 新增用户: 157, 上课用户: 4 },{ date: "07-18", 新增用户: 133, 上课用户: 2 },{ date: "07-19", 新增用户: 129, 上课用户: 4 },{ date: "07-20", 新增用户: 84, 上课用户: 0 },{ date: "07-21", 新增用户: 123, 上课用户: 2 },{ date: "07-22", 新增用户: 222, 上课用户: 3 }];
+      const retentionData = [{ date: "07-21", day1: 2.44, day3: null, day7: null },{ date: "07-20", day1: 2.38, day3: null, day7: null },{ date: "07-18", day1: 3.01, day3: 1.5, day7: null },{ date: "07-17", day1: 1.27, day3: 0.64, day7: null }];
+      const cohortFunnelMockData = { all: { "2025-07-21": { totalNewUsers: 123, login: [100, 105], class: [2, 5], speak: [1, 2] }, "2025-07-20": { totalNewUsers: 84, login: [70, 72, 75], class: [2, 5, 8], speak: [1, 2, 3] } }, wisdom_education: { "2025-07-21": { totalNewUsers: 100, login: [80, 85], class: [2, 4], speak: [1, 1] }, "2025-07-20": { totalNewUsers: 70, login: [60, 62, 65], class: [2, 4, 6], speak: [1, 1, 2] } } };
+      const sessionMockData = [{ inst: "wisdom_education", course: "course_a", segment: "all_users", values: [60, 150, 100, 50, 25, 10] },{ inst: "wisdom_education", course: "course_a", segment: "new_users", values: [10, 20, 15, 5, 1, 0] },{ inst: "wisdom_education", course: "course_b", segment: "new_users", values: [5, 15, 5, 2, 1, 1] },{ inst: "tsinghua", course: "course_c", segment: "all_users", values: [15, 30, 25, 15, 8, 6] }];
+      const courseMeta = { course_a: "迈向通用的人工智能", course_b: "社会心理学", course_c: "大学如何学" };
+      const chartLabels = ["0轮", "1轮", "2-3轮", "4-5轮", "6-10轮", "10+轮"];
+      const courseData = [{ name: "迈向通用的人工智能", students: 9634, completed: 120, active: 30, posts: 15, avgPages: 15.3, avgPosts: 0.5 },{ name: "MAIC说明书", students: 4115, completed: 281, active: 0, posts: 0, avgPages: 0, avgPosts: 0 },{ name: "社会心理学", students: 2795, completed: 5, active: 7, posts: 0, avgPages: 4.6, avgPosts: 0.0 },{ name: "大学如何学", students: 978, completed: 9, active: 7, posts: 0, avgPages: 6.4, avgPosts: 0.0 },];
+      const institutionData = [{ name: "国家智慧教育...", courses: 5, totalReg: 39438, newUsers: 276, classUsers: 65, periodDialog: 969, totalDialog: 267788 },{ name: "清华大学", courses: 18, totalReg: 1785, newUsers: 0, classUsers: 3, periodDialog: 27, totalDialog: 86710 },{ name: "MAIC体验客户", courses: 55, totalReg: 1215, newUsers: 0, classUsers: 9, periodDialog: 176, totalDialog: 30438 },{ name: "MAIC", courses: 27, totalReg: 555, newUsers: 0, classUsers: 3, periodDialog: 80, totalDialog: 3585 },];
+      const feedbackData = [{ text: "字幕不显示", time: "14:49", type: "Bug", status: "待处理", username: "user_alpha" },{ text: "字幕卡住了不会翻页", time: "12:00", type: "Bug", status: "处理中", username: "user_beta" },{ text: "音频问题：斜体符号语音模型会读出来", time: "11:51", type: "音频问题", status: "已解决", username: "user_gamma" },{ text: "讲稿区域，英文的换行不能切割单词。", time: "11:51", type: "体验优化", status: "待处理", username: "user_delta" },];
+      const perfMockData = { "all-all": { "首响-均值(秒)": 4.93, "首响-中位数(秒)": 4.77, "首响-95分位数(秒)": 7.44, "首响-9999分位数(秒)": 14.31, "首响-最大值(秒)": 14.31, "对话处理时长-均值(秒)": 3.63, "对话处理时长-最大值(秒)": 772.85, "模型调用并发-中位数": 3, "模型调用并发-95分位数": 3, "模型调用并发-最大值": 3, "模型调用并发-最大值时间": "2025-07-22 21:46:13", "对话并发-中位数": 7, "对话并发-95分位数": 7, "对话并发-最大值": 7, "对话并发-最大值时间": "2025-07-22 20:57:09", }, "tsinghua-all": { "首响-均值(秒)": 3.24, "首响-中位数(秒)": 2.97, "首响-95分位数(秒)": 4.65, "首响-9999分位数(秒)": 4.65, "首响-最大值(秒)": 4.65, "对话处理时长-均值(秒)": 1.91, "对话处理时长-最大值(秒)": 73.47, "模型调用并发-中位数": 2, "模型调用并发-95分位数": 2, "模型调用并发-最大值": 2, "模型调用并发-最大值时间": "2025-07-22 19:50:57", "对话并发-中位数": 2, "对话并发-95分位数": 2, "对话并发-最大值": 2, "对话并发-最大值时间": "2025-07-22 19:51:05", }, };
 
-            const sessionCard = document.getElementById('session-distribution-card');
-            sessionCard.innerHTML = `<h3 class="section-title mb-4">会话轮次分布</h3><div class="flex flex-col sm:flex-row gap-4 mb-4"><div class="flex-1"><select id="sessionInstitutionFilter" class="filter-select w-full"></select></div><div class="flex-1"><select id="sessionCourseFilter" class="filter-select w-full"></select></div><div class="flex-1"><select id="sessionUserSegmentFilter" class="filter-select w-full"></select></div></div><div id="session-summary" class="mb-2 p-2 bg-blue-50 rounded-md text-center text-xs"></div><div class="relative h-64"><canvas id="sessionDistributionChart"></canvas></div>`;
-            const sessionMockData=[{inst:'wisdom_education',course:'course_a',segment:'all_users',values:[60,150,100,50,25,10]},{inst:'wisdom_education',course:'course_a',segment:'new_users',values:[10,20,15,5,1,0]},{inst:'wisdom_education',course:'course_b',segment:'new_users',values:[5,15,5,2,1,1]},{inst:'tsinghua',course:'course_c',segment:'all_users',values:[15,30,25,15,8,6]},];const courseMeta={'course_a':'迈向通用的人工智能','course_b':'社会心理学','course_c':'大学如何学'};const chartLabels=['0轮','1轮','2-3轮','4-5轮','6-10轮','10+轮'];const instFilter=document.getElementById('sessionInstitutionFilter');const courseFilter=document.getElementById('sessionCourseFilter');const segmentFilter=document.getElementById('sessionUserSegmentFilter');let sessionChart;function updateSessionChart(){const instKey=instFilter.value;const courseKey=courseFilter.value;const segmentKey=segmentFilter.value;let filtered=sessionMockData;if(instKey!=='all')filtered=filtered.filter(d=>d.inst===instKey);if(courseKey!=='all')filtered=filtered.filter(d=>d.course===courseKey);if(segmentKey!=='all_users')filtered=filtered.filter(d=>d.segment===segmentKey);const result=new Array(chartLabels.length).fill(0);filtered.forEach(item=>{for(let i=0;i<result.length;i++){result[i]+=item.values[i]||0;}});const totalUsers=result.reduce((sum,value)=>sum+value,0);document.getElementById('session-summary').innerHTML=`总上课用户数: <b class="font-bold">${totalUsers}</b> 人。(“0轮”指进入课程但未对话的用户)`;if(sessionChart)sessionChart.destroy();sessionChart=new Chart(document.getElementById('sessionDistributionChart').getContext('2d'),{type:'bar',data:{labels:chartLabels,datasets:[{label:'用户数',data:result,backgroundColor:'rgba(79, 70, 229, 0.6)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}['全部机构','国家智慧教育平台','清华大学'].forEach((name,i)=>instFilter.add(new Option(name,['all','wisdom_education','tsinghua'][i])));courseFilter.add(new Option('全部课程','all'));Object.keys(courseMeta).forEach(key=>courseFilter.add(new Option(courseMeta[key],key)));['全部用户','新用户','老用户'].forEach((name,i)=>segmentFilter.add(new Option(name,['all_users','new_users','old_users'][i])));instFilter.addEventListener('change',updateSessionChart);courseFilter.addEventListener('change',updateSessionChart);segmentFilter.addEventListener('change',updateSessionChart);updateSessionChart();
-
-            const perfInstFilter = document.getElementById('perfInstFilter');
-            const perfCourseFilter = document.getElementById('perfCourseFilter');
-            const perfDataTable = document.getElementById('perfDataTable');
-            const perfMockData = {
-                'all-all': {"首响-均值(秒)":4.93,"首响-中位数(秒)":4.77,"首响-95分位数(秒)":7.44,"首响-9999分位数(秒)":14.31,"首响-最大值(秒)":14.31,"对话处理时长-均值(秒)":3.63,"对话处理时长-最大值(秒)":772.85,"模型调用并发-中位数":3,"模型调用并发-95分位数":3,"模型调用并发-最大值":3,"模型调用并发-最大值时间":"2025-07-22 21:46:13","对话并发-中位数":7,"对话并发-95分位数":7,"对话并发-最大值":7,"对话并发-最大值时间":"2025-07-22 20:57:09"},
-                'tsinghua-all': {"首响-均值(秒)":3.24,"首响-中位数(秒)":2.97,"首响-95分位数(秒)":4.65,"首响-9999分位数(秒)":4.65,"首响-最大值(秒)":4.65,"对话处理时长-均值(秒)":1.91,"对话处理时长-最大值(秒)":73.47,"模型调用并发-中位数":2,"模型调用并发-95分位数":2,"模型调用并发-最大值":2,"模型调用并发-最大值时间":"2025-07-22 19:50:57","对话并发-中位数":2,"对话并发-95分位数":2,"对话并发-最大值":2,"对话并发-最大值时间":"2025-07-22 19:51:05"},
-            };
-            function updatePerfTable() {
-                const instKey = perfInstFilter.value;
-                const courseKey = perfCourseFilter.value;
-                const key = `${instKey}-${courseKey}`;
-                const data = perfMockData[key] || perfMockData[`${instKey}-all`] || perfMockData['all-all'];
-                perfDataTable.innerHTML = `
-                    <tbody>
-                        <tr class="bg-gray-50"><td colspan="2" class="font-semibold">首响</td></tr>
-                        <tr><td class="pl-4">均值(秒)</td><td>${data['首响-均值(秒)']||'-'}</td></tr>
-                        <tr><td class="pl-4">中位数(秒)</td><td>${data['首响-中位数(秒)']||'-'}</td></tr>
-                        <tr><td class="pl-4">95分位数(秒)</td><td>${data['首响-95分位数(秒)']||'-'}</td></tr>
-                        <tr><td class="pl-4">9999分位数(秒)</td><td>${data['首响-9999分位数(秒)']||'-'}</td></tr>
-                        <tr><td class="pl-4">最大值(秒)</td><td>${data['首响-最大值(秒)']||'-'}</td></tr>
-                        <tr class="bg-gray-50"><td colspan="2" class="font-semibold">对话处理时长</td></tr>
-                        <tr><td class="pl-4">均值(秒)</td><td>${data['对话处理时长-均值(秒)']||'-'}</td></tr>
-                        <tr><td class="pl-4">最大值(秒)</td><td>${data['对话处理时长-最大值(秒)']||'-'}</td></tr>
-                        <tr class="bg-gray-50"><td colspan="2" class="font-semibold">模型调用并发</td></tr>
-                        <tr><td class="pl-4">中位数</td><td>${data['模型调用并发-中位数']||'-'}</td></tr>
-                        <tr><td class="pl-4">95分位数</td><td>${data['模型调用并发-95分位数']||'-'}</td></tr>
-                        <tr><td class="pl-4">最大值</td><td>${data['模型调用并发-最大值']||'-'}</td></tr>
-                        <tr><td class="pl-4">最大值时间</td><td>${data['模型调用并发-最大值时间']||'-'}</td></tr>
-                        <tr class="bg-gray-50"><td colspan="2" class="font-semibold">对话并发</td></tr>
-                        <tr><td class="pl-4">中位数</td><td>${data['对话并发-中位数']||'-'}</td></tr>
-                        <tr><td class="pl-4">95分位数</td><td>${data['对话并发-95分位数']||'-'}</td></tr>
-                        <tr><td class="pl-4">最大值</td><td>${data['对话并发-最大值']||'-'}</td></tr>
-                        <tr><td class="pl-4">最大值时间</td><td>${data['对话并发-最大值时间']||'-'}</td></tr>
-                    </tbody>`;
-            }
-            ['全部机构','国家智慧教育平台','清华大学'].forEach((name,i)=>perfInstFilter.add(new Option(name,['all','wisdom_education','tsinghua'][i])));
-            perfCourseFilter.add(new Option('全部课程', 'all'));
-            Object.keys(courseMeta).forEach(key=>perfCourseFilter.add(new Option(courseMeta[key], key)));
-            perfInstFilter.addEventListener('change', updatePerfTable);
-            perfCourseFilter.addEventListener('change', updatePerfTable);
-            updatePerfTable();
+      // --- Tab Switching Logic ---
+      function setupTabs(tabsContainerId, contentContainerId) {
+        const tabsContainer = document.getElementById(tabsContainerId);
+        const contentContainer = document.getElementById(contentContainerId);
+        tabsContainer.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'BUTTON') return;
+          tabsContainer.querySelector('[data-state="active"]').dataset.state = '';
+          e.target.dataset.state = 'active';
+          for (const child of contentContainer.children) {
+            child.classList.add('hidden');
+          }
+          contentContainer.querySelector(`[data-content="${e.target.dataset.tab}"]`).classList.remove('hidden');
         });
-    </script>
+      }
+      setupTabs('user-analysis-tabs', 'user-analysis-content');
+      setupTabs('content-analysis-tabs', 'content-analysis-content');
+      
+      // --- User Growth Chart ---
+      new Chart(document.getElementById('userGrowthChart'), { type: 'line', data: { labels: userGrowthData.map(d => d.date), datasets: [{ label: '新增用户', data: userGrowthData.map(d => d.新增用户), borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.3 }, { label: '上课用户', data: userGrowthData.map(d => d.上课用户), borderColor: '#d97706', backgroundColor: 'rgba(217, 119, 6, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+
+      // --- Retention Table ---
+      const retentionTableBody = document.getElementById('retentionTableBody');
+      retentionData.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = 'bg-white border-b';
+        tr.innerHTML = `<td class="px-6 py-4">${row.date}</td><td class="px-6 py-4 ${row.day1 ? 'text-emerald-800 bg-emerald-50 font-medium' : ''}">${row.day1 ? `${row.day1}%` : '-'}</td><td class="px-6 py-4 ${row.day3 ? 'text-emerald-800 bg-emerald-50 font-medium' : ''}">${row.day3 ? `${row.day3}%` : '-'}</td><td class="px-6 py-4 ${row.day7 ? 'text-emerald-800 bg-emerald-50 font-medium' : ''}">${row.day7 ? `${row.day7}%` : '-'}</td>`;
+        retentionTableBody.appendChild(tr);
+      });
+
+      // --- Cohort Funnel ---
+      const cohortInstFilter = document.getElementById('cohortInstFilter');
+      const cohortDateFilter = document.getElementById('cohortDateFilter');
+      const cutoffDateFilter = document.getElementById('cutoffDateFilter');
+      const cohortSummary = document.getElementById('cohortSummary');
+      const funnelDisplay = document.getElementById('funnelDisplay');
+      function updateCohortFunnel() { const instKey = cohortInstFilter.value; const cohortDateStr = cohortDateFilter.value; const cutoffDateStr = cutoffDateFilter.value; const data = cohortFunnelMockData[instKey]?.[cohortDateStr]; if (!data) { cohortSummary.textContent = "无可用数据"; funnelDisplay.innerHTML = ''; return; } const cohortStartDate = new Date(cohortDateStr + "T00:00:00Z"); const cutoffEndDate = new Date(cutoffDateStr + "T23:59:59Z"); if (cutoffEndDate < cohortStartDate) { cohortSummary.textContent = "截止日期需晚于注册日期"; funnelDisplay.innerHTML = ''; return; } const dayDiff = Math.floor((cutoffEndDate.getTime() - cohortStartDate.getTime()) / (1000 * 60 * 60 * 24)); const totalUsers = data.totalNewUsers; const loginCount = data.login[dayDiff] ?? data.login[data.login.length - 1]; const classCount = data.class[dayDiff] ?? data.class[data.class.length - 1]; const speakCount = data.speak[dayDiff] ?? data.speak[data.speak.length - 1]; cohortSummary.innerHTML = `分析 <b>${cohortDateStr}</b> 注册的 <b>${totalUsers}</b> 人, 在 <b>${dayDiff + 1}</b> 日内的累计转化。`; const steps = [{ label: "注册", value: totalUsers, prev: totalUsers },{ label: "登录", value: loginCount, prev: totalUsers },{ label: "上课", value: classCount, prev: loginCount },{ label: "发言", value: speakCount, prev: classCount }]; const colors = ["#4338ca", "#4f46e5", "#6366f1", "#818cf8"]; funnelDisplay.innerHTML = ''; steps.forEach((step, i) => { const stepConversion = i > 0 && step.prev > 0 ? ((step.value / step.prev) * 100).toFixed(1) : 0; const totalConversion = totalUsers > 0 ? ((step.value / totalUsers) * 100).toFixed(1) : 0; if (i > 0) { funnelDisplay.innerHTML += `<div class="funnel-arrow text-center"><i data-lucide="arrow-down" class="w-4 h-4 mx-auto"></i><span class="text-sm font-medium">${stepConversion}%</span></div>`; } funnelDisplay.innerHTML += `<div class="funnel-step"><div class="font-bold text-lg">${step.label}: ${step.value} 人</div><div class="text-sm opacity-80">总转化率: ${totalConversion}%</div></div>`; }); lucide.createIcons(); }
+      cohortInstFilter.innerHTML = `<option value="all">全部机构</option><option value="wisdom_education">国家智慧教育平台</option>`;
+      cohortDateFilter.innerHTML = `<option value="2025-07-21">2025-07-21</option><option value="2025-07-20">2025-07-20</option>`;
+      cutoffDateFilter.value = "2025-07-23";
+      [cohortInstFilter, cohortDateFilter, cutoffDateFilter].forEach(el => el.addEventListener('change', updateCohortFunnel));
+      updateCohortFunnel();
+
+      // --- Session Distribution ---
+      const sessionInstFilter = document.getElementById('sessionInstFilter');
+      const sessionCourseFilter = document.getElementById('sessionCourseFilter');
+      const sessionSegmentFilter = document.getElementById('sessionSegmentFilter');
+      const sessionSummary = document.getElementById('sessionSummary');
+      let sessionChart;
+      function updateSessionChart() { let filtered = sessionMockData; if (sessionInstFilter.value !== "all") filtered = filtered.filter(d => d.inst === sessionInstFilter.value); if (sessionCourseFilter.value !== "all") filtered = filtered.filter(d => d.course === sessionCourseFilter.value); if (sessionSegmentFilter.value !== "all_users") filtered = filtered.filter(d => d.segment === sessionSegmentFilter.value); const result = new Array(chartLabels.length).fill(0); filtered.forEach(item => { for (let i = 0; i < result.length; i++) result[i] += item.values[i] || 0 }); const totalUsers = result.reduce((a, b) => a + b, 0); sessionSummary.innerHTML = `总上课用户数: <span class="font-bold">${totalUsers}</span> 人。(“0轮”指进入课程但未对话的用户)`; if (sessionChart) sessionChart.destroy(); sessionChart = new Chart(document.getElementById('sessionDistributionChart'), { type: 'bar', data: { labels: chartLabels, datasets: [{ label: '用户数', data: result, backgroundColor: '#4f46e5' }] }, options: { responsive: true, maintainAspectRatio: false } }); }
+      sessionInstFilter.innerHTML = `<option value="all">全部机构</option><option value="wisdom_education">国家智慧教育平台</option><option value="tsinghua">清华大学</option>`;
+      sessionCourseFilter.innerHTML = `<option value="all">全部课程</option>` + Object.entries(courseMeta).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+      sessionSegmentFilter.innerHTML = `<option value="all_users">全部用户</option><option value="new_users">新用户</option><option value="old_users">老用户</option>`;
+      [sessionInstFilter, sessionCourseFilter, sessionSegmentFilter].forEach(el => el.addEventListener('change', updateSessionChart));
+      updateSessionChart();
+
+      // --- Content Analysis Tables ---
+      const courseTableBody = document.getElementById('courseTableBody');
+      courseData.forEach(c => {
+        const row = courseTableBody.insertRow();
+        row.className = 'bg-white border-b';
+        row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${c.name}</td><td class="px-6 py-4">${c.students}</td><td class="px-6 py-4">${c.completed}</td><td class="px-6 py-4">${c.active}</td><td class="px-6 py-4">${c.posts}</td><td class="px-6 py-4">${c.avgPages}</td><td class="px-6 py-4">${c.avgPosts}</td>`;
+      });
+      const institutionTableBody = document.getElementById('institutionTableBody');
+      institutionData.forEach(i => {
+        const row = institutionTableBody.insertRow();
+        row.className = 'bg-white border-b';
+        row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${i.name}</td><td class="px-6 py-4">${i.courses}</td><td class="px-6 py-4">${i.totalReg}</td><td class="px-6 py-4">${i.newUsers}</td><td class="px-6 py-4">${i.classUsers}</td><td class="px-6 py-4">${i.periodDialog}</td><td class="px-6 py-4">${i.totalDialog}</td>`;
+      });
+
+      // --- Feedback List ---
+      const feedbackList = document.getElementById('feedback-list');
+      const statusColors = { "待处理": "#f87171", "处理中": "#fb923c", "已解决": "#4ade80" };
+      const badgeColors = { "待处理": "bg-red-100 text-red-800", "处理中": "bg-orange-100 text-orange-800", "已解决": "bg-green-100 text-green-800" };
+      feedbackData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'relative pl-6 border-l-4';
+        div.style.borderColor = statusColors[item.status];
+        div.innerHTML = `<p class="text-base font-medium text-slate-800">${item.text}</p><div class="flex justify-between items-center mt-2"><p class="text-sm text-slate-500">${item.username} · ${item.time}</p><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeColors[item.status]}">${item.status}</span></div>`;
+        feedbackList.appendChild(div);
+      });
+
+      // --- Performance Table ---
+      const perfInstFilter = document.getElementById('perfInstFilter');
+      const perfCourseFilter = document.getElementById('perfCourseFilter');
+      const perfTable = document.getElementById('perfTable');
+      function updatePerfTable() {
+        const instKey = perfInstFilter.value;
+        const courseKey = perfCourseFilter.value;
+        const data = perfMockData[`${instKey}-${courseKey}`] || perfMockData[`${instKey}-all`] || perfMockData['all-all'];
+        let html = '<tbody>';
+        const sections = {
+          "首响": ["均值(秒)", "中位数(秒)", "95分位数(秒)", "9999分位数(秒)", "最大值(秒)"],
+          "对话处理时长": ["均值(秒)", "最大值(秒)"],
+          "模型调用并发": ["中位数", "95分位数", "最大值", "最大值时间"],
+          "对话并发": ["中位数", "95分位数", "最大值", "最大值时间"]
+        };
+        for (const section in sections) {
+          html += `<tr class="bg-slate-100 hover:bg-slate-100"><td colspan="2" class="p-3 font-semibold text-slate-800">${section}</td></tr>`;
+          sections[section].forEach(metric => {
+            const key = `${section}-${metric}`;
+            html += `<tr><td class="pl-8 p-3 text-slate-600">${metric}</td><td class="p-3 font-semibold text-slate-900">${data[key] || '-'}</td></tr>`;
+          });
+        }
+        html += '</tbody>';
+        perfTable.innerHTML = html;
+      }
+      perfInstFilter.innerHTML = `<option value="all">全部机构</option><option value="wisdom_education">国家智慧教育平台</option><option value="tsinghua">清华大学</option>`;
+      perfCourseFilter.innerHTML = `<option value="all">全部课程</option>` + Object.entries(courseMeta).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+      [perfInstFilter, perfCourseFilter].forEach(el => el.addEventListener('change', updatePerfTable));
+      updatePerfTable();
+    });
+  </script>
 </body>
 </html>
+
