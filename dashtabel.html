@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAIC 综合运营日报 (夸张虚拟版)</title>
+  <title>MAIC 综合运营日报 (专业悬浮提示版)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -32,14 +32,139 @@
         font-weight: 500;
         padding: 0.25rem 0;
     }
+    /* Header Tooltip Styles */
+    .th-tooltip {
+        position: relative;
+        cursor: help;
+    }
+    .th-tooltip .tooltip-content {
+        visibility: hidden;
+        width: 280px;
+        background-color: #1f2937;
+        color: #fff;
+        text-align: left;
+        border-radius: 6px;
+        padding: 8px 12px;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -140px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        text-transform: none; /* Override uppercase from thead */
+        pointer-events: none;
+        white-space: normal;
+    }
+    .th-tooltip .tooltip-content::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #1f2937 transparent transparent transparent;
+    }
+    .th-tooltip:hover .tooltip-content {
+        visibility: visible;
+        opacity: 1;
+    }
+    .tooltip-content .term {
+        font-weight: 600;
+        color: #9ca3af;
+        display: inline-block;
+        width: 60px;
+    }
+    
+    /* Row Details Tooltip */
+    #row-details-tooltip {
+        position: fixed;
+        z-index: 999;
+        transition: opacity 0.2s ease-in-out;
+        pointer-events: none;
+        opacity: 0;
+        width: 360px;
+        background-color: rgba(30, 41, 59, 0.9); /* slate-800 with alpha */
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(71, 85, 105, 0.5); /* slate-600 with alpha */
+        color: #f8fafc; /* slate-50 */
+        border-radius: 0.75rem; /* rounded-xl */
+        padding: 1rem;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+    }
+    
+    /* Responsive Table & Card Styles */
+    @media (max-width: 1024px) {
+        .responsive-table .table-container {
+            overflow: visible;
+        }
+        .responsive-table table {
+            border: 0;
+        }
+        .responsive-table thead {
+            display: none;
+        }
+        .responsive-table tbody {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: transparent;
+            border: 0;
+        }
+        .responsive-table tr {
+            display: block;
+            border: 1px solid #e5e7eb; /* slate-200 */
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 1rem;
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+        .responsive-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f3f4f6; /* slate-100 */
+            text-align: right;
+            font-size: 0.875rem;
+            white-space: normal;
+        }
+        .responsive-table tr td:last-child {
+            border-bottom: 0;
+        }
+        .responsive-table td::before {
+            content: attr(data-label);
+            font-weight: 500;
+            color: #475569; /* slate-600 */
+            text-align: left;
+            padding-right: 1rem;
+        }
+        /* Card Header Style */
+        .responsive-table td:first-child {
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #1e293b; /* slate-800 */
+            justify-content: flex-start; /* Align title to the left */
+        }
+        .responsive-table td:first-child::before {
+            display: none; /* Hide label for the title */
+        }
+    }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
   <div class="max-w-screen-2xl mx-auto p-4 sm:p-6 lg:p-8">
     <header class="mb-12">
-      <h1 class="text-5xl font-bold text-slate-900">MAIC 综合运营日报</h1>
-      <p class="text-xl text-slate-600 mt-3">统计日期：2025-07-25</p>
+      <h1 class="text-3xl sm:text-5xl font-bold text-slate-900">MAIC 综合运营日报</h1>
+      <p class="text-lg sm:text-xl text-slate-600 mt-3">统计日期：2025-07-27</p>
     </header>
+    
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-12">
       <div class="rounded-xl border bg-white p-6 transition-all duration-300 hover:bg-slate-50">
         <p class="text-lg font-semibold text-slate-800">注册用户数</p>
@@ -72,6 +197,7 @@
         <div class="flex items-center text-sm mt-2"><span class="flex items-center font-medium"></span><span class="text-slate-500 ml-1.5">较昨日</span></div>
       </div>
     </div>
+
     <main class="flex flex-col space-y-10">
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
@@ -91,13 +217,24 @@
               <div class="h-96"><canvas id="userGrowthChart"></canvas></div>
             </div>
             <div data-content="retention" class="hidden">
-              <table class="w-full text-sm text-left text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3">注册日</th><th class="px-6 py-3">次日</th><th class="px-6 py-3">3日</th><th class="px-6 py-3">7日</th></tr></thead><tbody id="retentionTableBody"></tbody></table>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3 text-left">注册日</th><th class="px-6 py-3 text-center">当日注册</th><th class="px-6 py-3 text-center">次日</th><th class="px-6 py-3 text-center">3日</th><th class="px-6 py-3 text-center">7日</th></tr></thead><tbody id="retentionTableBody"></tbody></table>
+              </div>
             </div>
             <div data-content="funnel" class="hidden">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <select id="cohortInstFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
-                <select id="cohortDateFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
-                <input type="date" id="cutoffDateFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"/>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 mb-4">
+                <div class="flex flex-col space-y-1">
+                    <label for="cohortInstFilter" class="text-xs font-medium text-slate-600">机构</label>
+                    <select id="cohortInstFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
+                </div>
+                 <div class="flex flex-col space-y-1">
+                    <label for="cohortDateFilter" class="text-xs font-medium text-slate-600">注册日期</label>
+                    <input type="date" id="cohortDateFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"/>
+                </div>
+                <div class="flex flex-col space-y-1">
+                    <label for="cutoffDateFilter" class="text-xs font-medium text-slate-600">截止日期</label>
+                    <input type="date" id="cutoffDateFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"/>
+                </div>
               </div>
               <div id="cohortSummary" class="text-center text-sm text-slate-600 p-2 bg-slate-100 rounded-md mb-4"></div>
               <div id="funnelDisplay" class="max-w-sm mx-auto space-y-0"></div>
@@ -114,6 +251,7 @@
           </div>
         </div>
       </div>
+
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
           <h2 class="flex items-center text-2xl font-bold text-slate-900">
@@ -127,18 +265,55 @@
           </div>
           <div id="content-analysis-content">
             <div data-content="courses">
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3">课程名称</th><th class="px-6 py-3">选课人数</th><th class="px-6 py-3">已完课用户</th><th class="px-6 py-3">活跃用户</th><th class="px-6 py-3">用户发言数</th><th class="px-6 py-3">平均学习(页)</th><th class="px-6 py-3">平均发言(次)</th></tr></thead><tbody id="courseTableBody"></tbody></table>
+              <div class="responsive-table">
+                <div class="border rounded-lg overflow-hidden">
+                  <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs font-medium text-slate-600 bg-slate-50">
+                      <tr>
+                        <th class="px-6 py-4 th-tooltip"><span>课程名称</span><div class="tooltip-content"><span class="term">定义:</span>课程的唯一名称。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>选课人数</span><div class="tooltip-content"><span class="term">周期:</span>历史累计<br><span class="term">定义:</span>曾经加入过此课程学习的总用户数（已去重）。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>已完课用户</span><div class="tooltip-content"><span class="term">周期:</span>历史累计<br><span class="term">定义:</span>已完成课程全部必修内容的用户总数。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>活跃用户</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，在课程内有过学习行为（如进入页面、对话等）的用户数（去重）。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>发言用户数</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，在课程内与AI至少有过一轮成功对话的用户数（去重）。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>用户发言数</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，课程内所有用户与AI成功对话的总轮次。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>平均学习(页)</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">逻辑:</span>周期内学习页数 / 周期内选课人数。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>平均发言(次)</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">逻辑:</span>周期内发言次数 / 周期内发言用户数。</div></th>
+                      </tr>
+                    </thead>
+                    <tbody id="courseTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                  </table>
+                </div>
               </div>
+              <div id="course-pagination" class="flex items-center justify-center space-x-4 mt-6"></div>
             </div>
             <div data-content="institutions" class="hidden">
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-slate-500"><thead class="text-xs text-slate-700 uppercase bg-slate-50"><tr><th class="px-6 py-3">机构名称</th><th class="px-6 py-3">课程数</th><th class="px-6 py-3">累计注册</th><th class="px-6 py-3">新增用户</th><th class="px-6 py-3">上课用户</th><th class="px-6 py-3">周期内对话</th><th class="px-6 py-3">累计对话</th></tr></thead><tbody id="institutionTableBody"></tbody></table>
+              <div class="responsive-table">
+                <div class="border rounded-lg overflow-hidden">
+                  <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs font-medium text-slate-600 bg-slate-50">
+                      <tr>
+                        <th class="px-6 py-4 th-tooltip"><span>机构名称</span><div class="tooltip-content"><span class="term">定义:</span>机构的唯一名称。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>课程数</span><div class="tooltip-content"><span class="term">周期:</span>历史累计<br><span class="term">定义:</span>该机构下已上线的课程总数。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>累计注册</span><div class="tooltip-content"><span class="term">周期:</span>历史累计<br><span class="term">定义:</span>通过机构专属链接或代码注册的总用户数。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>新增用户</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，通过机构专属链接或代码注册的用户数。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>上课用户</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，该机构的用户中至少进入过一个课程页面的用户数（去重）。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>发言用户</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，该机构的用户中至少有过一次成功对话的用户数（去重）。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>对话次数</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">定义:</span>在统计日当天，该机构下所有用户与AI成功对话的总轮次。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>累计对话次数</span><div class="tooltip-content"><span class="term">周期:</span>历史累计<br><span class="term">定义:</span>该机构下所有用户历史与AI成功对话的总轮次。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>平均学习(页)</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">逻辑:</span>机构下所有用户周期内学习页数 / 机构下周期内上课用户数。</div></th>
+                        <th class="px-6 py-4 th-tooltip"><span>平均发言(次)</span><div class="tooltip-content"><span class="term">周期:</span>统计日当日<br><span class="term">逻辑:</span>机构下所有用户周期内发言次数 / 机构下周期内发言用户数。</div></th>
+                      </tr>
+                    </thead>
+                    <tbody id="institutionTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+                  </table>
+                </div>
               </div>
+              <div id="institution-pagination" class="flex items-center justify-center space-x-4 mt-6"></div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
           <h2 class="flex items-center text-2xl font-bold text-slate-900">
@@ -147,6 +322,7 @@
         </div>
         <div id="feedback-list" class="p-6 pt-0 space-y-6"></div>
       </div>
+
       <div class="shadow-none border rounded-lg bg-white">
         <div class="p-6">
           <h2 class="flex items-center text-2xl font-bold text-slate-900">
@@ -158,16 +334,27 @@
             <select id="perfInstFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
             <select id="perfCourseFilter" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm"></select>
           </div>
-          <table class="w-full text-sm" id="perfTable"></table>
+          <div class="border rounded-lg overflow-hidden">
+            <table class="w-full text-sm" id="perfTable"></table>
+          </div>
         </div>
       </div>
     </main>
   </div>
+  
+  <!-- Row Details Tooltip -->
+  <div id="row-details-tooltip"></div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // --- Random Data Generation ---
+      // --- Constants and State ---
+      const ITEMS_PER_PAGE = 5;
+      const paginationState = {
+          courses: { currentPage: 1, data: [], headers: [], defs: {} },
+          institutions: { currentPage: 1, data: [], headers: [], defs: {} }
+      };
 
-      // Helper Functions
+      // --- Helper Functions ---
       const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
       const getRandomFloat = (min, max, decimals) => parseFloat((Math.random() * (max - min) + min).toFixed(decimals));
       const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -196,7 +383,7 @@
         const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
         return Array.from({ length }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
       };
-      
+            
       // --- Fictional Content Definition ---
       const fictionalInstitutions = {
         "cyberspace_admin": "未来事务管理局",
@@ -210,7 +397,11 @@
         "ai_ethics": "AI伦理与未来社会",
         "memeology_intro": "迷因学概论",
         "vr_construction": "虚拟现实构建",
-        "cat_philosophy": "猫咪哲学"
+        "cat_philosophy": "猫咪哲学",
+        "dark_forest": "黑暗森林法则应用",
+        "three_body": "三体问题求解",
+        "interstellar_nav": "星际航行导航学",
+        "alien_lang": "外星语言初探"
       };
       const fictionalFeedback = [
         "AI把我说的话当成歌词并进行了谱曲",
@@ -221,13 +412,11 @@
         "为什么课程没有教我如何建造戴森球？",
         "系统推荐我学习《如何与植物沟通》，但我家没植物"
       ];
-      
-      const REPORT_DATE_OFFSET = 1; // Report for yesterday
+            
+      const REPORT_DATE_OFFSET = 1;
       const REPORT_DATE_FULL = getPastDateString('full', REPORT_DATE_OFFSET);
-
       // --- Update Header and KPI Cards ---
-      document.querySelector('header p.text-xl').textContent = `统计日期：${REPORT_DATE_FULL}`;
-
+      document.querySelector('header p.text-lg').textContent = `统计日期：${REPORT_DATE_FULL}`;
       function updateKpiCard(cardIndex, mainValue, changeValue, unit = '%', isAbsoluteChange = false) {
           const card = document.querySelector(`.grid > .rounded-xl:nth-child(${cardIndex})`);
           let formattedMainValue = Number.isInteger(mainValue) && mainValue > 999 ? formatNumber(mainValue) : mainValue;
@@ -239,45 +428,41 @@
           let changeText = (isPositive ? '+' : '') + (isAbsoluteChange ? formatNumber(changeValue) : changeValue.toFixed(2) + unit);
           changeEl.innerHTML = `<i data-lucide="${isPositive ? 'trending-up' : 'arrow-down'}" class="h-4 w-4 mr-1"></i>${changeText}`;
       }
-      
       updateKpiCard(1, 100000, getRandomInt(-999, 999), '', true);
       updateKpiCard(2, getRandomInt(50, 2000), getRandomInt(-500, 500), '', true);
       updateKpiCard(3, getRandomInt(20, 1000), getRandomInt(-200, 200), '', true);
       updateKpiCard(4, getRandomFloat(0.1, 25.0, 2), getRandomFloat(-5, 5, 2), '%');
       updateKpiCard(5, getRandomFloat(0.5, 30.0, 2), getRandomFloat(-10, 10, 2), '%');
       updateKpiCard(6, getRandomInt(0, 50), getRandomInt(-10, 10), '', true);
-
       // --- Mock Data Generation ---
       const userGrowthData = Array.from({ length: 7 }, (_, i) => ({
           date: getPastDateString('short', 6 - i + REPORT_DATE_OFFSET),
           '新增用户': getRandomInt(50, 2500),
           '上课用户': getRandomInt(10, 800)
       }));
-
       const retentionData = Array.from({ length: 10 }, (_, i) => {
           const offset = i + REPORT_DATE_OFFSET;
+          const registered = getRandomInt(500, 4000);
           const day1 = getRandomFloat(1.0, 40.0, 2);
           const day3 = (offset >= 3) ? getRandomFloat(day1 * 0.1, day1 * 0.7, 2) : null;
           const day7 = (offset >= 7) ? getRandomFloat(day3 * 0.2, day3 * 0.8, 2) : null;
-          return { date: getPastDateString('full', offset), day1, day3, day7 };
+          return { date: getPastDateString('full', offset), registered, day1, day3, day7 };
       });
-
-      const cohortFunnelMockData = {};
-      const cohortInstitutions = Object.keys(fictionalInstitutions);
-      cohortInstitutions.unshift('all'); // Add 'all' to the beginning
-      const cohortDates = [getPastDateString('full', REPORT_DATE_OFFSET + 1), getPastDateString('full', REPORT_DATE_OFFSET + 2), getPastDateString('full', REPORT_DATE_OFFSET + 3)];
-      cohortInstitutions.forEach(instKey => {
-          cohortFunnelMockData[instKey] = {};
-          cohortDates.forEach(date => {
-              const factor = instKey === 'all' ? 1 : Math.random();
-              const totalNewUsers = Math.round(getRandomInt(100, 5000) * factor);
-              const maxLogin = Math.round(totalNewUsers * getRandomFloat(0.5, 0.95, 2));
-              const maxClass = Math.round(maxLogin * getRandomFloat(0.05, 0.5, 2));
-              const maxSpeak = Math.round(maxClass * getRandomFloat(0, 0.6, 2));
-              cohortFunnelMockData[instKey][date] = { totalNewUsers, login: generateCumulativeArray(maxLogin, 7), class: generateCumulativeArray(maxClass, 7), speak: generateCumulativeArray(maxSpeak, 7) };
-          });
-      });
-
+      const cohortFunnelDataCache = {};
+      function getOrGenerateFunnelData(inst, date) {
+          const key = `${inst}-${date}`;
+          if (cohortFunnelDataCache[key]) return cohortFunnelDataCache[key];
+                    
+          const factor = inst === 'all' ? 1 : Math.random();
+          const totalNewUsers = Math.round(getRandomInt(100, 5000) * factor);
+          const maxLogin = Math.round(totalNewUsers * getRandomFloat(0.5, 0.95, 2));
+          const maxClass = Math.round(maxLogin * getRandomFloat(0.05, 0.5, 2));
+          const maxSpeak = Math.round(maxClass * getRandomFloat(0, 0.6, 2));
+                    
+          const data = { totalNewUsers, login: generateCumulativeArray(maxLogin, 7), class: generateCumulativeArray(maxClass, 7), speak: generateCumulativeArray(maxSpeak, 7) };
+          cohortFunnelDataCache[key] = data;
+          return data;
+      }
       const sessionMockData = [];
       Object.keys(fictionalInstitutions).forEach(inst => {
           Object.keys(fictionalCourses).forEach(course => {
@@ -286,24 +471,45 @@
               });
           });
       });
-      
+            
       const courseData = Object.entries(fictionalCourses).map(([key, name]) => {
         const students = getRandomInt(10, 2000000);
-        const completed = getRandomInt(0, students * 0.2);
-        return { name, students, completed, active: getRandomInt(0, students * 0.1), posts: getRandomInt(0, students * 0.5), avgPages: getRandomFloat(1, 100, 1), avgPosts: getRandomFloat(0, 20, 1) }
+        const active = getRandomInt(0, students * 0.1);
+        const speakingUsers = getRandomInt(0, active);
+        return {
+             name, students,
+             completed: getRandomInt(0, students * 0.2),
+             active, speakingUsers,
+             posts: getRandomInt(speakingUsers, speakingUsers * 20),
+             avgPages: getRandomFloat(1, 100, 1),
+             avgPosts: speakingUsers > 0 ? getRandomFloat(1, 25, 1) : 0
+        }
       });
-      
-      const institutionData = Object.entries(fictionalInstitutions).map(([key, name]) => ({
-        name, courses: getRandomInt(1, 50), totalReg: getRandomInt(100, 5000000), newUsers: getRandomInt(0, 5000), classUsers: getRandomInt(0, 2000), periodDialog: getRandomInt(0, 100000), totalDialog: getRandomInt(1000, 99999999)
-      }));
-      
+            
+      const institutionData = Object.entries(fictionalInstitutions).map(([key, name]) => {
+        const totalReg = getRandomInt(100, 5000000);
+        const classUsers = getRandomInt(0, totalReg * 0.1);
+        const speakingUsers = getRandomInt(0, classUsers);
+        return {
+          name, 
+          courses: getRandomInt(1, 50), 
+          totalReg,
+          newUsers: getRandomInt(0, 5000), 
+          classUsers,
+          speakingUsers,
+          periodDialog: getRandomInt(speakingUsers, speakingUsers * 20), 
+          totalDialog: getRandomInt(totalReg, totalReg * 50),
+          avgPages: getRandomFloat(1, 200, 1),
+          avgPosts: speakingUsers > 0 ? getRandomFloat(1, 30, 1) : 0
+        }
+      });
+            
       const feedbackData = Array.from({ length: getRandomInt(5, 10) }, () => ({
           text: fictionalFeedback[getRandomInt(0, fictionalFeedback.length - 1)],
           time: `${getRandomInt(0, 23).toString().padStart(2, '0')}:${getRandomInt(0, 59).toString().padStart(2, '0')}`,
           status: ["待处理", "处理中", "已解决", "无法复现"][getRandomInt(0,3)],
           username: `user_${generateRandomString(6)}`
       }));
-
       const perfMockData = {};
       const perfKeys = ['all-all'];
       Object.keys(fictionalInstitutions).forEach(inst => perfKeys.push(`${inst}-all`));
@@ -320,7 +526,6 @@
           };
       });
       const chartLabels = ["0轮", "1轮", "2-3轮", "4-5轮", "6-10轮", "10+轮"];
-
       // --- Tab Switching Logic ---
       function setupTabs(tabsContainerId, contentContainerId) {
         const tabsContainer = document.getElementById(tabsContainerId);
@@ -337,20 +542,28 @@
       }
       setupTabs('user-analysis-tabs', 'user-analysis-content');
       setupTabs('content-analysis-tabs', 'content-analysis-content');
-      
+            
       // --- Render Charts & Tables with Randomized Data ---
       new Chart(document.getElementById('userGrowthChart'), { type: 'line', data: { labels: userGrowthData.map(d => d.date), datasets: [{ label: '新增用户', data: userGrowthData.map(d => d.新增用户), borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.3 }, { label: '上课用户', data: userGrowthData.map(d => d.上课用户), borderColor: '#d97706', backgroundColor: 'rgba(217, 119, 6, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
-      
+            
       const retentionTableBody = document.getElementById('retentionTableBody');
+      retentionTableBody.innerHTML = '';
       retentionData.forEach(row => {
-        const tr = document.createElement('tr'); tr.className = 'bg-white border-b';
-        tr.innerHTML = `<td class="px-6 py-4">${row.date}</td>` + ['day1', 'day3', 'day7'].map(d => {
+        const tr = document.createElement('tr');
+        tr.className = 'bg-white border-b';
+        let cellsHTML = `<td class="px-6 py-4 text-left">${row.date}</td><td class="px-6 py-4 font-medium text-center">${formatNumber(row.registered)}</td>`;
+        ['day1', 'day3', 'day7'].forEach(d => {
             const val = row[d];
-            return `<td class="px-6 py-4 ${val ? 'text-emerald-800 bg-emerald-50 font-medium' : ''}">${val ? `${val}%` : '-'}</td>`;
-        }).join('');
+            if (val !== null) {
+                const count = Math.round(row.registered * (val / 100));
+                cellsHTML += `<td class="px-6 py-4 text-emerald-800 bg-emerald-50 font-medium text-center">${val}%<br><span class="text-xs text-emerald-600 opacity-80">(${formatNumber(count)}人)</span></td>`;
+            } else {
+                cellsHTML += `<td class="px-6 py-4 text-center">-</td>`;
+            }
+        });
+        tr.innerHTML = cellsHTML;
         retentionTableBody.appendChild(tr);
       });
-
       const cohortInstFilter = document.getElementById('cohortInstFilter');
       const cohortDateFilter = document.getElementById('cohortDateFilter');
       const cutoffDateFilter = document.getElementById('cutoffDateFilter');
@@ -358,9 +571,18 @@
       const funnelDisplay = document.getElementById('funnelDisplay');
       function updateCohortFunnel() {
         const instKey = cohortInstFilter.value, cohortDateStr = cohortDateFilter.value, cutoffDateStr = cutoffDateFilter.value;
-        const data = cohortFunnelMockData[instKey]?.[cohortDateStr];
-        if (!data) { cohortSummary.textContent = "无可用数据"; funnelDisplay.innerHTML = ''; return; }
+        if (!cohortDateStr || !cutoffDateStr) {
+            cohortSummary.textContent = "请选择有效的注册日期和截止日期。";
+            funnelDisplay.innerHTML = '';
+            return;
+        }
+        const data = getOrGenerateFunnelData(instKey, cohortDateStr);
         const dayDiff = Math.max(0, Math.floor((new Date(cutoffDateStr) - new Date(cohortDateStr)) / (1000 * 60 * 60 * 24)));
+        if (new Date(cutoffDateStr) < new Date(cohortDateStr)) {
+            cohortSummary.textContent = "截止日期不能早于注册日期。";
+            funnelDisplay.innerHTML = '';
+            return;
+        }
         const totalUsers = data.totalNewUsers;
         const loginCount = data.login[Math.min(dayDiff, data.login.length - 1)];
         const classCount = data.class[Math.min(dayDiff, data.class.length - 1)];
@@ -379,11 +601,10 @@
         lucide.createIcons();
       }
       cohortInstFilter.innerHTML = `<option value="all">全部机构</option>` + Object.entries(fictionalInstitutions).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
-      cohortDateFilter.innerHTML = cohortDates.map(d => `<option value="${d}">${d}</option>`).join('');
-      cutoffDateFilter.value = getPastDateString('full', 0);
+      cohortDateFilter.value = getPastDateString('full', 8); // Default to 1 week before report date
+      cutoffDateFilter.value = REPORT_DATE_FULL;
       [cohortInstFilter, cohortDateFilter, cutoffDateFilter].forEach(el => el.addEventListener('change', updateCohortFunnel));
       updateCohortFunnel();
-
       const sessionInstFilter = document.getElementById('sessionInstFilter');
       const sessionCourseFilter = document.getElementById('sessionCourseFilter');
       const sessionSegmentFilter = document.getElementById('sessionSegmentFilter');
@@ -406,28 +627,178 @@
       sessionSegmentFilter.innerHTML = `<option value="all_users">全部用户</option><option value="new_users">新用户</option><option value="old_users">老用户</option>`;
       [sessionInstFilter, sessionCourseFilter, sessionSegmentFilter].forEach(el => el.addEventListener('change', updateSessionChart));
       updateSessionChart();
-
-      const courseTableBody = document.getElementById('courseTableBody');
-      courseData.forEach(c => { const row = courseTableBody.insertRow(); row.className = 'bg-white border-b'; row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${c.name}</td><td class="px-6 py-4">${formatNumber(c.students)}</td><td class="px-6 py-4">${formatNumber(c.completed)}</td><td class="px-6 py-4">${formatNumber(c.active)}</td><td class="px-6 py-4">${formatNumber(c.posts)}</td><td class="px-6 py-4">${c.avgPages}</td><td class="px-6 py-4">${c.avgPosts}</td>`; });
-      const institutionTableBody = document.getElementById('institutionTableBody');
-      institutionData.forEach(i => { const row = institutionTableBody.insertRow(); row.className = 'bg-white border-b'; row.innerHTML = `<td class="px-6 py-4 font-medium text-slate-900">${i.name}</td><td class="px-6 py-4">${i.courses}</td><td class="px-6 py-4">${formatNumber(i.totalReg)}</td><td class="px-6 py-4">${formatNumber(i.newUsers)}</td><td class="px-6 py-4">${formatNumber(i.classUsers)}</td><td class="px-6 py-4">${formatNumber(i.periodDialog)}</td><td class="px-6 py-4">${formatNumber(i.totalDialog)}</td>`; });
       
+      // --- Pagination Logic ---
+      function setupPagination(config) {
+          const { type, tableBodyId, paginationContainerId, data, headers, defs } = config;
+          
+          paginationState[type].data = data;
+          paginationState[type].headers = headers;
+          paginationState[type].defs = defs;
+
+          const paginationContainer = document.getElementById(paginationContainerId);
+
+          function renderPage() {
+              const state = paginationState[type];
+              const page = state.currentPage;
+              const tableBody = document.getElementById(tableBodyId);
+              tableBody.innerHTML = '';
+
+              const start = (page - 1) * ITEMS_PER_PAGE;
+              const end = start + ITEMS_PER_PAGE;
+              const paginatedItems = state.data.slice(start, end);
+
+              paginatedItems.forEach((item, index) => {
+                  const row = tableBody.insertRow();
+                  row.className = 'transition-colors hover:bg-slate-50';
+                  row.dataset.rowIndex = start + index; // Store original index
+                  row.dataset.type = type; // Store type for tooltip
+                  
+                  const itemValues = Object.values(item);
+                  let cellsHTML = '';
+                  itemValues.forEach((value, i) => {
+                      let displayValue = (typeof value === 'number' && value > 999 && i > 0) ? formatNumber(value) : value;
+                      const extraClass = i === 0 ? 'font-medium text-slate-900' : 'text-slate-600';
+                      cellsHTML += `<td data-label="${state.headers[i]}" class="px-6 py-4 whitespace-nowrap ${extraClass}">${displayValue}</td>`;
+                  });
+                  row.innerHTML = cellsHTML;
+              });
+
+              const pageCount = Math.ceil(state.data.length / ITEMS_PER_PAGE);
+              if (pageCount <= 1) {
+                  paginationContainer.innerHTML = '';
+                  return;
+              }
+              
+              paginationContainer.innerHTML = `
+                  <button id="${type}-prev-btn" class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                      上一页
+                  </button>
+                  <span class="text-sm text-slate-700">
+                      第 ${page} 页 / 共 ${pageCount} 页
+                  </span>
+                  <button id="${type}-next-btn" class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                      下一页
+                  </button>
+              `;
+
+              const prevBtn = document.getElementById(`${type}-prev-btn`);
+              const nextBtn = document.getElementById(`${type}-next-btn`);
+
+              prevBtn.disabled = page === 1;
+              nextBtn.disabled = page === pageCount;
+
+              prevBtn.addEventListener('click', () => {
+                  if (state.currentPage > 1) {
+                      state.currentPage--;
+                      renderPage();
+                  }
+              });
+
+              nextBtn.addEventListener('click', () => {
+                  if (state.currentPage < pageCount) {
+                      state.currentPage++;
+                      renderPage();
+                  }
+              });
+          }
+
+          renderPage();
+      }
+
+      const courseHeaders = Array.from(document.querySelectorAll('#content-analysis-content [data-content=courses] thead th')).map(th => th.querySelector('span').textContent);
+      const courseDefs = {};
+      document.querySelectorAll('#content-analysis-content [data-content=courses] thead th').forEach((th, i) => {
+          courseDefs[courseHeaders[i]] = th.querySelector('.tooltip-content').innerHTML;
+      });
+
+      const institutionHeaders = Array.from(document.querySelectorAll('#content-analysis-content [data-content=institutions] thead th')).map(th => th.querySelector('span').textContent);
+      const institutionDefs = {};
+      document.querySelectorAll('#content-analysis-content [data-content=institutions] thead th').forEach((th, i) => {
+          institutionDefs[institutionHeaders[i]] = th.querySelector('.tooltip-content').innerHTML;
+      });
+
+      setupPagination({ type: 'courses', tableBodyId: 'courseTableBody', paginationContainerId: 'course-pagination', data: courseData, headers: courseHeaders, defs: courseDefs });
+      setupPagination({ type: 'institutions', tableBodyId: 'institutionTableBody', paginationContainerId: 'institution-pagination', data: institutionData, headers: institutionHeaders, defs: institutionDefs });
+      
+      // --- Row Details Tooltip Logic ---
+      function initializeContentTooltips() {
+          const tooltipEl = document.getElementById('row-details-tooltip');
+          const tableContainer = document.getElementById('content-analysis-content');
+
+          tableContainer.addEventListener('mouseover', (e) => {
+              const row = e.target.closest('tr');
+              if (!row || !row.dataset.rowIndex || window.innerWidth <= 1024) return;
+
+              const type = row.dataset.type;
+              const index = parseInt(row.dataset.rowIndex, 10);
+              const state = paginationState[type];
+              const itemData = state.data[index];
+              const itemValues = Object.values(itemData);
+
+              let tooltipHTML = `<div class="font-bold text-lg mb-3 pb-2 border-b border-slate-600">${itemValues[0]}</div><ul class="space-y-3 text-sm">`;
+              
+              state.headers.slice(1).forEach((header, i) => {
+                  const value = itemValues[i + 1];
+                  const displayValue = (typeof value === 'number' && value > 999) ? formatNumber(value) : value;
+                  tooltipHTML += `
+                      <li>
+                          <div class="flex justify-between items-center">
+                              <span class="font-semibold text-slate-300">${header}</span>
+                              <span class="font-mono text-base">${displayValue}</span>
+                          </div>
+                          <div class="text-xs text-slate-400 mt-1 pl-2 border-l-2 border-slate-700">${state.defs[header]}</div>
+                      </li>
+                  `;
+              });
+              tooltipHTML += `</ul>`;
+              tooltipEl.innerHTML = tooltipHTML;
+              tooltipEl.style.opacity = '1';
+          });
+
+          tableContainer.addEventListener('mouseout', (e) => {
+              const row = e.target.closest('tr');
+              if (row) {
+                  tooltipEl.style.opacity = '0';
+              }
+          });
+
+          document.addEventListener('mousemove', (e) => {
+              if (tooltipEl.style.opacity === '1') {
+                  const xOffset = 20;
+                  const yOffset = 10;
+                  let left = e.clientX + xOffset;
+                  let top = e.clientY + yOffset;
+
+                  if (left + tooltipEl.offsetWidth > window.innerWidth) {
+                      left = e.clientX - tooltipEl.offsetWidth - xOffset;
+                  }
+                  if (top + tooltipEl.offsetHeight > window.innerHeight) {
+                      top = e.clientY - tooltipEl.offsetHeight - yOffset;
+                  }
+                  tooltipEl.style.left = `${left}px`;
+                  tooltipEl.style.top = `${top}px`;
+              }
+          });
+      }
+      initializeContentTooltips();
+            
       const feedbackList = document.getElementById('feedback-list');
       const statusColors = { "待处理": "#f87171", "处理中": "#fb923c", "已解决": "#4ade80", "无法复现": "#9ca3af" };
       const badgeColors = { "待处理": "bg-red-100 text-red-800", "处理中": "bg-orange-100 text-orange-800", "已解决": "bg-green-100 text-green-800", "无法复现": "bg-slate-100 text-slate-800" };
       feedbackData.forEach(item => { const div = document.createElement('div'); div.className = 'relative pl-6 border-l-4'; div.style.borderColor = statusColors[item.status]; div.innerHTML = `<p class="text-base font-medium text-slate-800">${item.text}</p><div class="flex justify-between items-center mt-2"><p class="text-sm text-slate-500">${item.username} · ${item.time}</p><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeColors[item.status]}">${item.status}</span></div>`; feedbackList.appendChild(div); });
-      
+            
       const perfInstFilter = document.getElementById('perfInstFilter');
       const perfCourseFilter = document.getElementById('perfCourseFilter');
       const perfTable = document.getElementById('perfTable');
       function updatePerfTable() {
         const key = `${perfInstFilter.value}-${perfCourseFilter.value}`;
         const data = perfMockData[key] || perfMockData[`${perfInstFilter.value}-all`] || perfMockData['all-all'];
-        let html = '<tbody>';
+        let html = '<tbody class="divide-y divide-slate-200">';
         const sections = { "首响": ["均值(秒)", "中位数(秒)", "95分位数(秒)", "9999分位数(秒)", "最大值(秒)"], "对话处理时长": ["均值(秒)", "最大值(秒)"], "模型调用并发": ["中位数", "95分位数", "最大值", "最大值时间"], "对话并发": ["中位数", "95分位数", "最大值", "最大值时间"] };
         for (const section in sections) {
-          html += `<tr class="bg-slate-100 hover:bg-slate-100"><td colspan="2" class="p-3 font-semibold text-slate-800">${section}</td></tr>`;
-          sections[section].forEach(metric => { const key = `${section}-${metric}`; html += `<tr><td class="pl-8 p-3 text-slate-600">${metric}</td><td class="p-3 font-semibold text-slate-900">${data[key] || '-'}</td></tr>`; });
+          html += `<tr class="bg-slate-50"><td colspan="2" class="p-3 font-semibold text-slate-800">${section}</td></tr>`;
+          sections[section].forEach(metric => { const key = `${section}-${metric}`; html += `<tr class="transition-colors hover:bg-slate-50"><td class="pl-8 p-3 text-slate-600">${metric}</td><td class="p-3 font-medium text-slate-900">${data[key] || '-'}</td></tr>`; });
         }
         perfTable.innerHTML = html + '</tbody>';
       }
@@ -435,7 +806,6 @@
       perfCourseFilter.innerHTML = `<option value="all">全部课程</option>` + Object.entries(fictionalCourses).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
       [perfInstFilter, perfCourseFilter].forEach(el => el.addEventListener('change', updatePerfTable));
       updatePerfTable();
-
       // Finally, create all icons.
       lucide.createIcons();
     });
